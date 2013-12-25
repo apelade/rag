@@ -36,9 +36,22 @@ describe 'Command Line Interface' do
     expect(grader).not_to eq Grader.help
     #AutoGrader.create('1', 'WeightedRspecGrader', IO.read(ARGV[0]), :spec => ARGV[1])
   end
+  @DUMMY_RESULTS = 'DUMMY_RESULTS'
   it 'should be able to handle feature grader arguments' do
-    grader = Grader.cli(["-t","HW3Grader","-a","/tmp/","features.tar.gz","hwz.yml"])
-    expect(grader).not_to eq Grader.help
+    cli_args = ['-t','HW3Grader','-a','/tmp/','features.tar.gz','hwz.yml']
+    auto_args = ['3','HW3Grader','features.tar.gz', :spec => 'hwz.yml']
+    Kernel.should_receive(:const_get).with('HW3Grader').and_return(HW3Grader)
+    HW3Grader.should_receive(:autograder_args).with(cli_args).and_return(auto_args)
+    AutoGrader.should_receive(:create).with(*auto_args).and_return(mock_auto_grader)
+    grader = Grader.cli cli_args
+    expect(grader).to match /#{@DUMMY_RESULTS}/
+  end
+  def mock_auto_grader
+    auto_grader = double('AutoGrader')
+    auto_grader.should_receive(:grade!)
+    auto_grader.should_receive(:normalized_score).with(100).and_return(67)
+    auto_grader.should_receive(:comments).and_return(@DUMMY_RESULTS)
+    return auto_grader
   end
   xit 'should be able to receive different arguments depending on the grader specified' do
     #HW1 e.g. new_grader -t WeightedRspecGrader "#{PFX}/correct_example.rb", "#{PFX}/correct_example.spec.rb"
