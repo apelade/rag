@@ -6,12 +6,12 @@ class HW3Grader < FeatureGrader
     begin
       start_dir = Dir.getwd
       Dir.chdir tmp_dir
-      do_cli autograder_args args
+      do_cli format_cli args
     ensure
       Dir.chdir start_dir
     end
   end
-  def self.autograder_args(args)
+  def self.format_cli(args)
     raise ArgumentError unless args.respond_to?(:length) && args.length == 6
     type, archive , hw_yml  = args[1], args[4], args[5]
     return [ '3', type, archive, :spec => hw_yml]
