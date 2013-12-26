@@ -10,13 +10,11 @@ describe 'Command Line Interface' do
   it 'should display help when args are not appropriate' do
     expect(Grader.cli(['something'])).to eq Grader.help
   end
-  describe 'should produce appropriate response to WeightedRspecGrader arguments' do
-    it 'with correct args' do
-      cli_args = ['-t','WeightedRspecGrader','correct_example.rb','correct_example.spec.rb']
-      grd_args = ['1', 'WeightedRspecGrader','some code',{:spec => 'correct_example.spec.rb'}]
-      IO.should_receive(:read).with('correct_example.rb').and_return('some code')
-      execute cli_args, grd_args
-    end
+  it 'should produce appropriate response to WeightedRspecGrader arguments' do
+    cli_args = ['-t','WeightedRspecGrader','correct_example.rb','correct_example.spec.rb']
+    grd_args = ['1', 'WeightedRspecGrader','some code',{:spec => 'correct_example.spec.rb'}]
+    IO.should_receive(:read).with('correct_example.rb').and_return('some code')
+    execute cli_args, grd_args
   end
   it 'should be able to handle passing in a github username' do
     cli_args = ['-t','GithubRspecGrader','tansaku','github_spec.rb']
