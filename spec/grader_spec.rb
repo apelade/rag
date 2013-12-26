@@ -5,7 +5,7 @@ describe 'Command Line Interface' do
     expect(Grader).not_to be_nil
   end
   it 'should define a cli method' do
-    lambda { Grader.cli }.should_not raise_error(::NoMethodError)
+    expect(Grader).to respond_to :cli
   end
   it 'should display help when args are not appropriate' do
     expect(Grader.cli(['something'])).to eq Grader.help

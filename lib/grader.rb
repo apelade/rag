@@ -6,30 +6,24 @@ class Grader
       case type = args[1]
         when 'HW3Grader' then return Kernel.const_get(type).cli args
         when /Grader/ then return handle_rspec_grader args
-        else return help
+        else return self.help
       end
     rescue
-      return help
+      return self.help
     end
   end
   def self.handle_rspec_grader(args)
     t_opt, type, file, specs = args
     file = IO.read file if type == 'WeightedRspecGrader'
     spec_hash = {:spec => specs}
-    spec_hash = {:admin_user => args[3], :admin_pass => args[4], :spec => args[5]} if type == 'HW5Grader'
+    if type == 'HW5Grader'
+      t_opt, type, file, user, pass, specs = args
+      spec_hash = {:admin_user => user, :admin_pass => pass, :spec => specs}
+    end
     g = AutoGrader.create '1', type, file, spec_hash
     g.grade!
-    feedback g
+    self.feedback g
   end
-=begin
-  def self.handle_heroku_grader(args)
-    t_opt, type, file, specs = args
-    debugger
-    g = AutoGrader.create '5', type, file, :spec => specs
-    g.grade!
-    feedback g
-  end
-=end
   def self.feedback(g)
     <<EndOfFeedback
 Score out of 100: #{g.normalized_score(100)}
