@@ -41,7 +41,7 @@ describe 'Command Line Interface' do
     grd_args = [ '4','HW4Grader','input.tar.gz', {:description => 'hw4.yml'}]
     execute cli_args, grd_args
   end
-  # This slow integration test requires Gemfile changes and a valid input file in rag/spec/fixtures
+  # This slow integration test adds 10% coverage, requires Gemfile changes and a valid tar file in rag/spec/fixtures
   it 'should also report results from HW4Grader when not stubbed out' do
     begin
       cur_dir = Dir.getwd
