@@ -48,4 +48,29 @@ describe 'Command Line Interface' do
     #HW4 e.g. new_grader -t HW4Grader input.tar.gz description.yml
     #HW5 e.g. new_grader -t HW5Grader submission_uri admin_user admin_password specfile.rb
   end
+  it 'should be able to accept a HW4Grader project and report results' do
+    cli_args = ['-t','HW4Grader','input.tar.gz', 'hw4.yml']
+    grd_args = [ '4','HW4Grader','input.tar.gz', {:description => 'hw4.yml'}]
+    grader = execute cli_args, grd_args
+  end
+  # This slow integration test requires Gemfile changes and a valid input file in rag/
+  xit 'should also report results from HW4Grader when not stubbed out' do
+    cli_args = ['-t','HW4Grader','input.tar.gz', 'hw4.yml']
+    grader = Grader.cli cli_args
+    expect(grader).to match /Total score:/
+  end
+  @MOCK_RESULTS = 'MOCK_RESULTS'
+  def mock_auto_grader
+    auto_grader = double('AutoGrader')
+    auto_grader.should_receive(:grade!)
+    auto_grader.should_receive(:normalized_score).with(100).and_return(67)
+    auto_grader.should_receive(:comments).and_return(@MOCK_RESULTS)
+    return auto_grader
+  end
+  def execute(cli_args, grader_args, expected=/#{@MOCK_RESULTS}/)
+    AutoGrader.should_receive(:create).with(*grader_args).and_return(mock_auto_grader)
+    grader = Grader.cli cli_args
+    expect(grader).to match expected
+    return grader
+  end
 end

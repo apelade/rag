@@ -135,6 +135,8 @@ class HW4Grader < AutoGrader
           #exit_status = wait_thr.value
 
           lines = stdout.readlines
+          # show all the errors for integration and debug
+          #lines += stderr.readlines
           lines.each(&:chomp!)
           self.send :process_output, lines
         end

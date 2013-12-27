@@ -5,7 +5,8 @@ class Grader
     return self.help if args.length != 4
     type = args[1]
     args[2] = IO.read(args[2]) if type == 'WeightedRspecGrader'
-    g = AutoGrader.create('1', args[1] ,args[2] ,:spec => args[3])
+    g = AutoGrader.create('1', args[1] ,args[2], :spec => args[3]) if /RspecGrader/.match type
+    g = AutoGrader.create('4', args[1], args[2], :description => args[3]) if type == 'HW4Grader'
     g.grade!
     self.feedback(g)
   end
