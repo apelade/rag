@@ -5,6 +5,18 @@ class Grader
     begin
       case type = args[1]
         when 'HW3Grader' then return Kernel.const_get(type).cli args
+        when 'HW4Grader'
+          t_opt, type, file, specs = args
+          spec_hash = {:description => specs}
+          g = AutoGrader.create '4', type, file, spec_hash
+          g.grade!
+          return self.feedback g
+        when 'HW5Grader'
+          t_opt, type, file, user, pass, specs = args
+          spec_hash = {:admin_user => user, :admin_pass => pass, :spec => specs}
+          g = AutoGrader.create '5', type, file, spec_hash
+          g.grade!
+          return self.feedback g
         when /Grader/ then return handle_rspec_grader args
         else return self.help
       end
@@ -16,10 +28,6 @@ class Grader
     t_opt, type, file, specs = args
     file = IO.read file if type == 'WeightedRspecGrader'
     spec_hash = {:spec => specs}
-    if type == 'HW5Grader'
-      t_opt, type, file, user, pass, specs = args
-      spec_hash = {:admin_user => user, :admin_pass => pass, :spec => specs}
-    end
     g = AutoGrader.create '1', type, file, spec_hash
     g.grade!
     self.feedback g
@@ -49,4 +57,3 @@ For example, try these, where PREFIX=rag/spec/fixtures:
 EndOfHelp
   end
 end
-

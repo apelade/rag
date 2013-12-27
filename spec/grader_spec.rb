@@ -33,11 +33,25 @@ describe 'Command Line Interface' do
     grading_rules = {:admin_user => 'admin', :admin_pass => 'password', :spec => spec_file}
     uri = 'myname.herokuapp.com'
     cli_args = ['-t','HW5Grader',uri,'admin','password',spec_file]
-    grd_args = ['1', 'HW5Grader',uri,grading_rules]
+    grd_args = ['5', 'HW5Grader',uri,grading_rules]
     execute cli_args, grd_args
   end
-  xit 'should be able to receive different arguments depending on the grader specified' do
-    #HW4 e.g. new_grader -t HW4Grader input.tar.gz description.yml
+  it 'should be able to accept a HW4Grader project and report results' do
+    cli_args = ['-t','HW4Grader','input.tar.gz', 'hw4.yml']
+    grd_args = [ '4','HW4Grader','input.tar.gz', {:description => 'hw4.yml'}]
+    execute cli_args, grd_args
+  end
+  # This slow integration test requires Gemfile changes and a valid input file in rag/spec/fixtures
+  it 'should also report results from HW4Grader when not stubbed out' do
+    begin
+      cur_dir = Dir.getwd
+      FileUtils.cp cur_dir+'/spec/fixtures/hw4_sample_input.tar.gz', cur_dir
+      cli_args = ['-t','HW4Grader','hw4_sample_input.tar.gz', 'hw4.yml']
+      grader = Grader.cli cli_args
+      expect(grader).to match /Total score:/
+    ensure
+      FileUtils.rm cur_dir+'/hw4_sample_input.tar.gz'
+    end
   end
   @MOCK_RESULTS = 'MOCK_RESULTS'
   def mock_auto_grader
@@ -47,9 +61,10 @@ describe 'Command Line Interface' do
     auto_grader.should_receive(:comments).and_return(@MOCK_RESULTS)
     return auto_grader
   end
-  def execute(cli_args, grader_args)
+  def execute(cli_args, grader_args, expected=/#{@MOCK_RESULTS}/)
     AutoGrader.should_receive(:create).with(*grader_args).and_return(mock_auto_grader)
     grader = Grader.cli cli_args
-    expect(grader).to match /#{@MOCK_RESULTS}/
+    expect(grader).to match expected
+    return grader
   end
 end
