@@ -54,10 +54,16 @@ describe 'Command Line Interface' do
     grader = execute cli_args, grd_args
   end
   # This slow integration test requires Gemfile changes and a valid input file in rag/
-  xit 'should also report results from HW4Grader when not stubbed out' do
-    cli_args = ['-t','HW4Grader','input.tar.gz', 'hw4.yml']
-    grader = Grader.cli cli_args
-    expect(grader).to match /Total score:/
+  it 'should also report results from HW4Grader when not stubbed out' do
+    begin
+      cur_dir = Dir.getwd
+      FileUtils.cp cur_dir+'/spec/fixtures/hw4_sample_input.tar.gz', cur_dir
+      cli_args = ['-t','HW4Grader','hw4_sample_input.tar.gz', 'hw4.yml']
+      grader = Grader.cli cli_args
+      expect(grader).to match /Total score:/
+    ensure
+      FileUtils.rm cur_dir+'/hw4_sample_input.tar.gz'
+    end
   end
   @MOCK_RESULTS = 'MOCK_RESULTS'
   def mock_auto_grader
