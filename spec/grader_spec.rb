@@ -16,10 +16,22 @@ describe 'Command Line Interface' do
     IO.should_receive(:read).with('correct_example.rb').and_return('some code')
     execute cli_args, grd_args
   end
+  xit 'should capture needed itegration for weighted rspec grader cli' do
+    begin
+      cur_dir = Dir.getwd
+      FileUtils.cp cur_dir+'/spec/fixtures/correct_example.rb', cur_dir
+      FileUtils.cp cur_dir+'/spec/fixtures/correct_example.spec.rb', cur_dir
+      cli_args = ['-t','WeightedRspecGrader','correct_example.rb','correct_example.spec.rb']
+      grader = Grader.cli cli_args
+      expect(grader).to eq Grader.help
+    end
+  end
   it 'should be able to handle passing in a github username' do
     cli_args = ['-t','GithubRspecGrader','tansaku','github_spec.rb']
     grd_args = ['1', 'GithubRspecGrader','tansaku',{:spec => 'github_spec.rb'}]
     execute cli_args, grd_args
+  end
+  xit 'should capture needed itegration for github grader cli' do
   end
   it 'should be able to handle feature grader arguments' do
     cli_args = ['-t','HW3Grader','-a','/tmp/','features.tar.gz','hwz.yml']
@@ -27,6 +39,13 @@ describe 'Command Line Interface' do
     Kernel.should_receive(:const_get).with('HW3Grader').and_return(HW3Grader)
     HW3Grader.should_receive(:format_cli).with(cli_args).and_return(grd_args)
     execute cli_args, grd_args
+  end
+  it 'should capture needed itegration for feature grader cli' do
+    FileUtils.cp Dir.getwd+'/spec/fixtures/features.tar.gz', '/tmp'
+    FileUtils.cp Dir.getwd+'/spec/fixtures/hwz.yml', '/tmp'
+    cli_args = ['-t','HW3Grader','-a','/tmp/','features.tar.gz','hwz.yml']
+    grader = Grader.cli cli_args
+    expect(grader).to match /^(Normalized )?Score out of 100:/
   end
   it 'should be able to handle heroku grader arguments' do
     spec_file = 'hw5specs.rb'
@@ -36,13 +55,20 @@ describe 'Command Line Interface' do
     grd_args = ['5', 'HW5Grader',uri,grading_rules]
     execute cli_args, grd_args
   end
+  xit 'should capture needed integration for heroku grader cli' do
+    uri = 'myname.herokuapp.com'
+    spec_file = 'hw5specs.rb'
+    cli_args = ['-t','HW5Grader',uri,'admin','password',spec_file]
+    grader = Grader.cli cli_args
+    expect(grader).to eq Grader.help
+  end
   it 'should be able to accept a HW4Grader project and report results' do
     cli_args = ['-t','HW4Grader','input.tar.gz', 'hw4.yml']
     grd_args = [ '4','HW4Grader','input.tar.gz', {:description => 'hw4.yml'}]
     execute cli_args, grd_args
   end
   # This slow integration test adds 10% coverage, requires Gemfile changes and a valid tar file in rag/spec/fixtures
-  it 'should also report results from HW4Grader when not stubbed out' do
+  xit 'should also report results from HW4Grader when not stubbed out' do
     begin
       cur_dir = Dir.getwd
       FileUtils.cp cur_dir+'/spec/fixtures/hw4_sample_input.tar.gz', cur_dir
