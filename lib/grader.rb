@@ -2,8 +2,9 @@ require './lib/auto_grader.rb'
 
 class Grader
   def self.cli(args)
-    return self.help if args.length != 4
+    return self.help unless args.length > 1
     type = args[1]
+    return Kernel.const_get(type).cli(args) if type == 'HW3Grader'
     args[2] = IO.read(args[2]) if type == 'WeightedRspecGrader'
     g = AutoGrader.create('1', args[1] ,args[2] ,:spec => args[3])
     g.grade!
