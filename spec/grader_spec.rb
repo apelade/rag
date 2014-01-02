@@ -4,37 +4,22 @@ describe 'Command Line Interface' do
   it 'should exist' do
     expect(Grader).not_to be_nil
   end
-  it "should define a cli method" do
-    lambda { Grader.cli }.should_not raise_error(::NoMethodError)
+  it 'should define a cli method' do
+    expect(Grader).to respond_to :cli
   end
   it 'should display help when args are not appropriate' do
-    expect(Grader.cli(["something"])).to eq Grader.help
+    expect(Grader.cli(['something'])).to eq Grader.help
   end
-  describe 'should produce appropriate response to correct WeightedRspecGrader arguments' do
-    before(:each) do
-      IO.should_receive(:read).with("correct_example.rb").and_return("some code")
-      args = '1', 'WeightedRspecGrader',"some code",{:spec => "correct_example.spec.rb"}
-      @auto_grader = mock('AutoGrader')
-      @auto_grader.should_receive(:grade!)
-      AutoGrader.should_receive(:create).with(*args).and_return(@auto_grader)
-    end
-    it 'should produce correctly formatted output' do
-      @auto_grader.should_receive(:normalized_score).with(100).and_return(67)
-      @auto_grader.should_receive(:comments).and_return('stuff')
-      grader = Grader.cli(["-t","WeightedRspecGrader","correct_example.rb","correct_example.spec.rb"])
-      expect(grader.to_s).not_to eq Grader.help
-    end
+  it 'should produce appropriate response to WeightedRspecGrader arguments' do
+    cli_args = ['-t','WeightedRspecGrader','correct_example.rb','correct_example.spec.rb']
+    grd_args = ['1', 'WeightedRspecGrader','some code',{:spec => 'correct_example.spec.rb'}]
+    IO.should_receive(:read).with('correct_example.rb').and_return('some code')
+    execute cli_args, grd_args
   end
   it 'should be able to handle passing in a github username' do
-    args = '1', 'GithubRspecGrader',"tansaku",{:spec => "github_spec.rb"}
-    auto_grader = mock('AutoGrader')
-    auto_grader.should_receive(:grade!)
-    auto_grader.should_receive(:normalized_score).with(100).and_return(67)
-    auto_grader.should_receive(:comments).and_return('stuff')
-    AutoGrader.should_receive(:create).with(*args).and_return(auto_grader)
-    grader = Grader.cli(["-t","GithubRspecGrader","tansaku","github_spec.rb"])
-    expect(grader).not_to eq Grader.help
-    #AutoGrader.create('1', 'WeightedRspecGrader', IO.read(ARGV[0]), :spec => ARGV[1])
+    cli_args = ['-t','GithubRspecGrader','tansaku','github_spec.rb']
+    grd_args = ['1', 'GithubRspecGrader','tansaku',{:spec => 'github_spec.rb'}]
+    execute cli_args, grd_args
   end
   it 'should be able to handle feature grader arguments' do
     cli_args = ['-t','HW3Grader','-a','/tmp/','features.tar.gz','hwz.yml']
