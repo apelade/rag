@@ -11,39 +11,39 @@ describe 'Command Line Interface' do
     expect(Grader.cli(['something'])).to eq Grader.help
   end
   it 'should produce appropriate response to WeightedRspecGrader arguments' do
-    cli_args = ['-t','WeightedRspecGrader','correct_example.rb','correct_example.spec.rb']
-    grd_args = ['Weighted ID','WeightedRspecGrader','some code',{:spec => 'correct_example.spec.rb'}]
+    cli_args = ['-t', 'WeightedRspecGrader', 'correct_example.rb', 'correct_example.spec.rb']
+    grd_args = ['Weighted ID', 'WeightedRspecGrader', 'some code', {:spec => 'correct_example.spec.rb'}]
     IO.should_receive(:read).with('correct_example.rb').and_return('some code')
     execute cli_args, grd_args
   end
   it 'should be able to handle passing in a github username' do
-    cli_args = ['-t','GithubRspecGrader','tansaku','github_spec.rb']
-    grd_args = ['Github ID','GithubRspecGrader','tansaku',{:spec => 'github_spec.rb'}]
+    cli_args = ['-t', 'GithubRspecGrader', 'tansaku', 'github_spec.rb']
+    grd_args = ['Github ID', 'GithubRspecGrader', 'tansaku', {:spec => 'github_spec.rb'}]
     execute cli_args, grd_args
   end
   it 'should be able to handle simple heroku grader arguments' do
     spec_file = 'hw2specs.rb'
     uri = 'myname.herokuapp.com'
-    cli_args = ['-t','HW2Grader',uri,spec_file]
-    grd_args = ['2', 'HW2Grader',uri,{:spec => spec_file}]
+    cli_args = ['-t', 'HW2Grader', uri, spec_file]
+    grd_args = [ '2', 'HW2Grader', uri, {:spec => spec_file}]
     execute cli_args, grd_args
   end
   it 'should be able to handle heroku grader arguments with user and pass' do
     spec_file = 'hw5specs.rb'
     grading_rules = {:admin_user => 'admin', :admin_pass => 'password', :spec => spec_file}
     uri = 'myname.herokuapp.com'
-    cli_args = ['-t','HW5Grader',uri,'admin','password',spec_file]
-    grd_args = ['5', 'HW5Grader',uri,grading_rules]
+    cli_args = ['-t', 'HW5Grader', uri, 'admin', 'password', spec_file]
+    grd_args = [ '5', 'HW5Grader', uri, grading_rules]
     execute cli_args, grd_args
   end
-  it 'should be able to accept a HW4Grader project and report results' do
-    cli_args = ['-t','HW4Grader','input.tar.gz', 'hw4.yml']
-    grd_args = [ '4','HW4Grader','input.tar.gz', {:description => 'hw4.yml'}]
+  it 'should be able to handle a feature grader project and report results' do
+    cli_args = ['-t', 'HW4Grader', 'input.tar.gz', 'hw4.yml']
+    grd_args = [ '4', 'HW4Grader', 'input.tar.gz', {:description => 'hw4.yml'}]
     execute cli_args, grd_args
   end
-  it 'should be able to handle feature grader arguments' do
-    cli_args = ['-t','HW3Grader','-a','/tmp/','features.tar.gz','hwz.yml']
-    grd_args = ['3', 'HW3Grader','features.tar.gz',{:spec => 'hwz.yml'}]
+  it 'should be able to handle feature grader arguments with working directory' do
+    cli_args = ['-t', 'HW3Grader', '-a', '/tmp/', 'features.tar.gz', 'hwz.yml']
+    grd_args = [ '3', 'HW3Grader', 'features.tar.gz', {:spec => 'hwz.yml'}]
     execute cli_args, grd_args
   end
   def execute(cli_args, grd_args, expected=/#{@MOCK_RESULTS}/)

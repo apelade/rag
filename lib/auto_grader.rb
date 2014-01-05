@@ -77,6 +77,10 @@ class AutoGrader
     # default method does nothing and leaves a score of 0
   end
 
+  def self.format_cli(t_opt, type, answer, specs)
+    return [ ENV['ASSIGNMENT_ID'], type, answer, specs]
+  end
+  
   private
 
   def self.class_init

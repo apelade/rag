@@ -155,9 +155,9 @@ class HW4Grader < AutoGrader
   end
 
   def self.format_cli(t_opt, type, file, specs)
-    spec_hash = {:description => specs}
     ENV['ASSIGNMENT_ID'] = '4'
-    return [ENV['ASSIGNMENT_ID'], type, file, spec_hash]
+    spec_hash = {:description => specs}
+    super t_opt, type, file, spec_hash
   end
   
   private

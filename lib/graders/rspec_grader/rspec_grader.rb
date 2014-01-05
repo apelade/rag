@@ -29,6 +29,7 @@ class RspecGrader < AutoGrader
   end
   
   def self.format_cli(t_opt, type, file, specs)
-    return [ENV['ASSIGNMENT_ID'], type, file, {:spec => specs}]
+    spec_hash = {:spec => specs}
+    super t_opt, type, file, spec_hash
   end
 end

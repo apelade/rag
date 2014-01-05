@@ -12,6 +12,7 @@ class HerokuRspecGrader < WeightedRspecGrader
   end
 
   def self.format_cli(t_opt, type, uri, spec_hash)
-    return [ENV['ASSIGNMENT_ID'], type, uri, spec_hash]
+    # Refuse parent and grandparent impl, go for great-gramps
+    AutoGrader.format_cli t_opt, type, uri, spec_hash
   end
 end
