@@ -29,6 +29,11 @@ describe 'Command Line Interface' do
     grd_args = ['5', 'HW5Grader',uri,grading_rules]
     execute cli_args, grd_args
   end
+  it 'should be able to accept a HW4Grader project and report results' do
+    cli_args = ['-t','HW4Grader','input.tar.gz', 'hw4.yml']
+    grd_args = [ '4','HW4Grader','input.tar.gz', {:description => 'hw4.yml'}]
+    execute cli_args, grd_args
+  end
   it 'should be able to handle feature grader arguments' do
     cli_args = ['-t','HW3Grader','-a','/tmp/','features.tar.gz','hwz.yml']
     grd_args = ['3', 'HW3Grader','features.tar.gz',{:spec => 'hwz.yml'}]
