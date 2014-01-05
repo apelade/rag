@@ -27,5 +27,8 @@ class RspecGrader < AutoGrader
     @raw_max = runner.total
     @comments = runner.output
   end
-
+  
+  def self.format_cli(t_opt, type, file, specs)
+    return [ENV['ASSIGNMENT_ID'], type, file, {:spec => specs}]
+  end
 end

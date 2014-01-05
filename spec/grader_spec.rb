@@ -12,13 +12,13 @@ describe 'Command Line Interface' do
   end
   it 'should produce appropriate response to WeightedRspecGrader arguments' do
     cli_args = ['-t','WeightedRspecGrader','correct_example.rb','correct_example.spec.rb']
-    grd_args = ['1', 'WeightedRspecGrader','some code',{:spec => 'correct_example.spec.rb'}]
+    grd_args = ['Weighted ID','WeightedRspecGrader','some code',{:spec => 'correct_example.spec.rb'}]
     IO.should_receive(:read).with('correct_example.rb').and_return('some code')
     execute cli_args, grd_args
   end
   it 'should be able to handle passing in a github username' do
     cli_args = ['-t','GithubRspecGrader','tansaku','github_spec.rb']
-    grd_args = ['1', 'GithubRspecGrader','tansaku',{:spec => 'github_spec.rb'}]
+    grd_args = ['Github ID','GithubRspecGrader','tansaku',{:spec => 'github_spec.rb'}]
     execute cli_args, grd_args
   end
   it 'should be able to handle heroku grader arguments' do
@@ -32,8 +32,6 @@ describe 'Command Line Interface' do
   it 'should be able to handle feature grader arguments' do
     cli_args = ['-t','HW3Grader','-a','/tmp/','features.tar.gz','hwz.yml']
     grd_args = ['3', 'HW3Grader','features.tar.gz',{:spec => 'hwz.yml'}]
-    Kernel.should_receive(:const_get).with('HW3Grader').and_return(HW3Grader)
-    HW3Grader.should_receive(:format_cli).with(cli_args).and_return(grd_args)
     execute cli_args, grd_args
   end
   @MOCK_RESULTS = 'MOCK_RESULTS'
@@ -44,8 +42,12 @@ describe 'Command Line Interface' do
     auto_grader.should_receive(:comments).and_return(@MOCK_RESULTS)
     return auto_grader
   end
-  def execute(cli_args, grader_args, expected=/#{@MOCK_RESULTS}/)
-    AutoGrader.should_receive(:create).with(*grader_args).and_return(mock_auto_grader)
+  def execute(cli_args, grd_args, expected=/#{@MOCK_RESULTS}/)
+    type = cli_args[1]
+    ag_class = Kernel.const_get type
+    expect  {ag_class.format_cli(*cli_args).to match_array grd_args}.to be_true
+    expect(ag_class).to receive(:format_cli).with(*cli_args).and_call_original
+    expect(AutoGrader).to receive(:create).with(*grd_args).and_return(mock_auto_grader)
     grader = Grader.cli cli_args
     expect(grader).to match expected
     return grader

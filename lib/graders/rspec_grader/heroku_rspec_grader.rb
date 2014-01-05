@@ -10,4 +10,9 @@ class HerokuRspecGrader < WeightedRspecGrader
     ENV['HEROKU_URI'] = @heroku_uri
     super
   end
+
+  def self.format_cli(t_opt, type, file, user, pass, specs)
+    spec_hash = {:admin_user => user, :admin_pass => pass, :spec => specs}
+    return [ENV['ASSIGNMENT_ID'], type, file, spec_hash]
+  end
 end

@@ -12,4 +12,9 @@ class HW5Grader < HerokuRspecGrader
     ENV['ADMIN_PASS'] = @admin_pass
     super
   end
+  
+  def self.format_cli(t_opt, type, file, user, pass, specs)
+    ENV['ASSIGNMENT_ID'] = '5'
+    super t_opt, type, file, user, pass, specs
+  end
 end
