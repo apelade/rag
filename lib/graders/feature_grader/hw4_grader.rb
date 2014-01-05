@@ -154,6 +154,11 @@ class HW4Grader < AutoGrader
     end
   end
 
+  def self.format_cli(t_opt, type, file, specs)
+    ENV['ASSIGNMENT_ID'] = '4'
+    return [ENV['ASSIGNMENT_ID'], type, file, {:description => specs}]
+  end
+  
   private
 
   def load_description
