@@ -34,6 +34,19 @@ describe 'Command Line Interface' do
     grd_args = ['3', 'HW3Grader','features.tar.gz',{:spec => 'hwz.yml'}]
     execute cli_args, grd_args
   end
+  def execute(cli_args, grd_args, expected=/#{@MOCK_RESULTS}/)
+    set_common_expectations cli_args, grd_args
+    grader = Grader.cli cli_args
+    expect(grader).to match expected
+    return grader
+  end
+  def set_common_expectations(cli_args, grd_args)
+    type = cli_args[1]
+    ag_class = Kernel.const_get type
+    expect  {ag_class.format_cli(*cli_args).to match_array grd_args}.to be_true
+    expect(ag_class).to receive(:format_cli).with(*cli_args).and_call_original
+    expect(AutoGrader).to receive(:create).with(*grd_args).and_return(mock_auto_grader)
+  end
   @MOCK_RESULTS = 'MOCK_RESULTS'
   def mock_auto_grader
     auto_grader = double('AutoGrader')
@@ -41,23 +54,5 @@ describe 'Command Line Interface' do
     auto_grader.should_receive(:normalized_score).with(100).and_return(67)
     auto_grader.should_receive(:comments).and_return(@MOCK_RESULTS)
     return auto_grader
-  end
-  def execute(cli_args, grd_args, expected=/#{@MOCK_RESULTS}/)
-    type = cli_args[1]
-    ag_class = Kernel.const_get type
-    expect  {ag_class.format_cli(*cli_args).to match_array grd_args}.to be_true
-    expect(ag_class).to receive(:format_cli).with(*cli_args).and_call_original
-    expect(AutoGrader).to receive(:create).with(*grd_args).and_return(mock_auto_grader)
-    grader = Grader.cli cli_args
-    expect(grader).to match expected
-    return grader
-  end
-  xit 'should be able to receive different arguments depending on the grader specified' do
-    #HW1 e.g. new_grader -t WeightedRspecGrader "#{PFX}/correct_example.rb", "#{PFX}/correct_example.spec.rb"
-    #HW1.5 e.g. new_grader -t HerokuRspecGrader? github_user_name specfile.rb
-    #HW2 e.g. new_grader -t HerokuRspecGrader submission_uri specfile.rb
-    #HW3 e.g. new_grader -t HW3Grader -a /path/to/app/ input.tar.gz description.yml
-    #HW4 e.g. new_grader -t HW4Grader input.tar.gz description.yml
-    #HW5 e.g. new_grader -t HW5Grader submission_uri admin_user admin_password specfile.rb
   end
 end

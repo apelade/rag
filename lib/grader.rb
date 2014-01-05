@@ -3,10 +3,12 @@ require './lib/auto_grader.rb'
 class Grader
 
   def self.cli(args)
-    return help unless args.length >= 4
+    return help unless args.respond_to?(:length) && args.length >= 4
     return run_grader args unless args.index '-a'
     return run_elsewhere args
   end
+  
+  private
   
   def self.run_grader(args)
     return help unless args.index '-t'
@@ -14,16 +16,14 @@ class Grader
     formatted_args = Kernel.const_get(type).format_cli *args
     g = AutoGrader.create *formatted_args
     g.grade!
-    self.feedback(g)
+    self.feedback g
   end
   
   def self.run_elsewhere(args)
     a_index = args.index '-a'
     return help unless a_index && args.length > a_index.to_i + 1
     tmp_dir = args[a_index + 1]
-    Dir.chdir(tmp_dir){
-      run_grader args
-    }#rescue ENOENT, "Dir #{tmp_dir} may not exist or be writable"
+    Dir.chdir(tmp_dir) { run_grader args }
   end
   
   def self.feedback(g)
