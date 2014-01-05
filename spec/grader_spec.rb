@@ -21,7 +21,14 @@ describe 'Command Line Interface' do
     grd_args = ['Github ID','GithubRspecGrader','tansaku',{:spec => 'github_spec.rb'}]
     execute cli_args, grd_args
   end
-  it 'should be able to handle heroku grader arguments' do
+  it 'should be able to handle simple heroku grader arguments' do
+    spec_file = 'hw2specs.rb'
+    uri = 'myname.herokuapp.com'
+    cli_args = ['-t','HW2Grader',uri,spec_file]
+    grd_args = ['2', 'HW2Grader',uri,{:spec => spec_file}]
+    execute cli_args, grd_args
+  end
+  it 'should be able to handle heroku grader arguments with user and pass' do
     spec_file = 'hw5specs.rb'
     grading_rules = {:admin_user => 'admin', :admin_pass => 'password', :spec => spec_file}
     uri = 'myname.herokuapp.com'
