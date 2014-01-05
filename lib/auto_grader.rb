@@ -12,6 +12,7 @@ class AutoGrader
     load "lib/graders/rspec_grader/github_rspec_grader.rb"
     load "lib/graders/rspec_grader/heroku_rspec_grader.rb"
     load "lib/graders/rspec_grader/hw5_grader.rb"
+    load "lib/graders/rspec_grader/hw2_grader.rb"
     load "lib/graders/beautiful_code_grader/beautiful_code_grader.rb"
     load "lib/graders/migration_grader/migration_grader.rb"
     load "lib/graders/multiple_choice_grader/multiple_choice_grader.rb"
