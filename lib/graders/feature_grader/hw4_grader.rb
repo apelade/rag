@@ -153,11 +153,12 @@ class HW4Grader < AutoGrader
       @temp.destroy if @temp
     end
   end
-
-  def self.format_cli(t_opt, type, file, specs)
-    ENV['ASSIGNMENT_ID'] = '4'
+  
+  ASSIGNMENT_ID = '4'
+  
+  def self.format_cli(t_option, type, file, specs)
     spec_hash = {:description => specs}
-    super t_opt, type, file, spec_hash
+    return ASSIGNMENT_ID, type, file, spec_hash
   end
   
   private

@@ -13,9 +13,10 @@ class HW5Grader < HerokuRspecGrader
     super
   end
   
-  def self.format_cli(t_opt, type, uri, user, pass, specs)
-    ENV['ASSIGNMENT_ID'] = '5'
+  ASSIGNMENT_ID = '5'
+  
+  def self.format_cli(t_option, type, uri, user, pass, specs)
     spec_hash = {:admin_user => user, :admin_pass => pass, :spec => specs}
-    super t_opt, type, uri, spec_hash
+    return ASSIGNMENT_ID, type, uri, spec_hash
   end
 end

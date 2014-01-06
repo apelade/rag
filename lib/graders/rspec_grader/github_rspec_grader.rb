@@ -6,9 +6,10 @@ class GithubRspecGrader < WeightedRspecGrader
     ENV['GITHUB_USERNAME'] = username.strip.delete("\n")
   end
 
-  def self.format_cli(t_opt, type, file, specs)
-    ENV['ASSIGNMENT_ID'] = 'Github ID'
+  ASSIGNMENT_ID = 'Github ID'
+  
+  def self.format_cli(t_option, type, file, specs)
     # Refuse super file read
-    RspecGrader.format_cli t_opt, type, file, specs
+    RspecGrader.format_cli ASSIGNMENT_ID, type, file, specs
   end
 end

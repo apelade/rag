@@ -28,8 +28,8 @@ class RspecGrader < AutoGrader
     @comments = runner.output
   end
   
-  def self.format_cli(t_opt, type, file, specs)
+  def self.format_cli(assignment_id, type, file, specs)
     spec_hash = {:spec => specs}
-    super t_opt, type, file, spec_hash
+    return assignment_id, type, file, spec_hash
   end
 end
