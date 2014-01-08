@@ -1,14 +1,31 @@
 require './lib/auto_grader.rb'
 
 class Grader
+
   def self.cli(args)
-    return self.help if args.length != 4
-    type = args[1]
-    args[2] = IO.read(args[2]) if type == 'WeightedRspecGrader'
-    g = AutoGrader.create('1', args[1] ,args[2] ,:spec => args[3])
-    g.grade!
-    self.feedback(g)
+    return help unless args.respond_to?(:length) && args.length >= 4
+    return run_grader args unless args.index '-a'
+    return run_elsewhere args
   end
+  
+  private
+  
+  def self.run_grader(args)
+    return help unless args.index '-t'
+    type = args[1]
+    formatted_args = Kernel.const_get(type).format_cli *args
+    g = AutoGrader.create *formatted_args
+    g.grade!
+    self.feedback g
+  end
+  
+  def self.run_elsewhere(args)
+    a_index = args.index '-a'
+    return help unless a_index && args.length > a_index.to_i + 1
+    tmp_dir = args[a_index + 1]
+    Dir.chdir(tmp_dir) { run_grader args }
+  end
+  
   def self.feedback(g)
     <<EndOfFeedback
 Score out of 100: #{g.normalized_score(100)}

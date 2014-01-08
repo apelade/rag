@@ -17,7 +17,7 @@ $CUKE_RUNNER = File.join(File.expand_path('lib/graders/feature_grader'), 'cuke_r
 
 # +AutoGrader+ that scores using weird stuff
 class HW4Grader < AutoGrader
-
+  
   class ScenarioMatcher
     attr_reader :regex, :desc
 
@@ -153,7 +153,14 @@ class HW4Grader < AutoGrader
       @temp.destroy if @temp
     end
   end
-
+  
+  @assignment_id  = '4'
+  
+  def self.format_cli(t_option, type, file, specs)
+    spec_hash = {:description => specs}
+    return @assignment_id, type, file, spec_hash
+  end
+  
   private
 
   def load_description
