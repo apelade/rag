@@ -16,7 +16,7 @@ Then(/^the results should be the help/) do
 end
 
 
-Given(/^several needed gems are available/) do
+Given(/^I have several needed gems available$/) do
   ['rails',
    'rspec-rails',
    'sqlite3',
@@ -25,7 +25,7 @@ Given(/^several needed gems are available/) do
    'haml-rails',
    'database_cleaner'
   ].each{ | gem |
-    output = `sudo gem list #{gem}`
+    output = `gem list #{gem}`
     expect(output.delete("\n")).to match /#{gem}\s/
   }
 end
@@ -55,5 +55,3 @@ end
 And(/^not a bunch of errors/) do
   @hw4_result.should_not match 'Error'
 end
-
-
