@@ -20,11 +20,11 @@ class WeightedRspecGrader < RspecGrader
       end
     end
   end
-
-  ASSIGNMENT_ID = 'Weighted ID'
+  
+  @assignment_id = 'Weighted ID'
   
   def self.format_cli(t_option, type, file, specs)
     file = IO.read file # TODO: defend
-    super ASSIGNMENT_ID, type, file, specs
+    super @assignment_id, type, file, specs
   end
 end
