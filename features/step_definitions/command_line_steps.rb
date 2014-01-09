@@ -16,6 +16,9 @@ Then(/^the results should be the help/) do
 end
 
 
+#################################################################
+
+
 Given(/^I have several needed gems available$/) do
   ['rails',
    'rspec-rails',
@@ -52,6 +55,65 @@ Then(/^I should see "(.*?)"/) do |arg1|
   @hw4_result.should match arg1
 end
 
-And(/^not a bunch of errors/) do
+And(/^I should not see "Error"/) do
   @hw4_result.should_not match 'Error'
 end
+
+
+#################################################################
+
+
+Given(/^the HW3 background is complete$/) do
+# Make a test feature archive and dirs or depend on cuke to do it. Fixture?
+ cucumber_code = "Feature: feature\n  Scenario: Test\n    Given OK"
+ cucumber_steps= "Given /^OK/ do\n  true\nend"
+ mutation_yml  = 'hwz.yml'
+ FileUtils.mkdir_p '/tmp/log'
+ FileUtils.mkdir_p '/tmp/db'
+ FileUtils.mkdir_p '/tmp/features/step_definitions'
+ FileUtils.touch '/tmp/db/test.sqlite3'
+ FileUtils.cp "#{Dir::getwd}/#{mutation_yml}", '/tmp'
+ File.open('/tmp/features/test.feature','w') do |file|
+   file.write cucumber_code
+ end
+ File.open('/tmp/features/step_definitions/test_steps.rb','w') do |file|
+   file.write cucumber_steps
+ end
+ expect{
+   tar_output = %x{'tar czf /tmp/features.tar.gz -C /tmp/ features/'}
+ }.not_to raise_error
+end
+
+When(/^I run a HW3Grader/) do
+  args = ['-t', 'WeightedRspecGrader','spec/fixtures/correct_example.rb','spec/fixtures/correct_example.spec.rb']
+  @hw3_output = Grader.cli(args)
+end
+
+Then(/^HW3 should have the expected output$/) do
+  @hw3_output.should =~ /Score out of 100: 0/
+  @hw3_output.should =~ /BEGIN rspec comments/
+  @hw3_output.should =~ /1 example, 0 failures/
+
+   #lacks 'END cucumber comments' if /tmp/log/ not exist
+end
+
+
+#################################################################
+
+
+When(/^I run a WeightedRspecGrader$/) do
+  # equivalent to ./new_grader -t WeightedRspecGrader spec/fixtures/correct_example.rb spec/fixtures/correct_example.spec.rb
+  args = ['-t', 'WeightedRspecGrader','spec/fixtures/correct_example.rb','spec/fixtures/correct_example.spec.rb']
+  @cli_output = Grader.cli(args)
+end
+
+Then(/^it should have the expected output$/) do
+  @cli_output.should =~ AutoGraderSubprocess::COMMENT_REGEX
+end
+
+
+#################################################################
+
+# HW 2, 5, Github, migration
+
+   
