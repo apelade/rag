@@ -6,3 +6,7 @@ Feature: Command line grader
   Scenario: Simple Script
     When I run a WeightedRspecGrader
     Then it should have the expected output
+    
+  Scenario: Feature Grader that uses student features archive
+    When I run a HW3Grader
+    Then I should see that it passed

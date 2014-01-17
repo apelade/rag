@@ -177,3 +177,26 @@ Then(/^it should have the expected output$/) do
   @cli_output.should =~ AutoGraderSubprocess::COMMENT_REGEX
 end
 
+When(/^I run a HW3Grader$/) do
+  # prefix_path = '/home/adminuser/dev/rag/spec/fixtures/hw3'
+  # Presumes process launched in rag/
+  prefix_path = Dir.getwd + '/spec/fixtures/hw3'
+  FileUtils.cp_r "#{prefix_path}/rottenpotatoes" , '/tmp/'
+
+  #  args = ['-t', 'HW3Grader', '-a', '/path/to/app/', 'input.tar.gz', 'description.yml' ]
+  args = [
+      '-t',
+      'HW3Grader',
+      '-a',
+      '/tmp/rottenpotatoes',
+      "#{prefix_path}/hw3_full_answer_no_parent_dir_app5.tar.gz", # WORKS!
+      ###   "#{prefix_path}/hw3_student_features.tar.gz # Doesn't work, need to add base app files",
+      "#{prefix_path}/hw3.yml"
+  ]
+  @hw3_output = Grader.cli(args)
+end
+
+Then(/^I should see that it passed$/) do
+  @hw3_output.should =~ AutoGraderSubprocess::COMMENT_REGEX
+  @hw3_output.should =~ AutoGraderSubprocess::SCORE_REGEX
+end
