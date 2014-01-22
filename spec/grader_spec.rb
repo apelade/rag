@@ -36,25 +36,46 @@ describe 'Command Line Interface' do
     expect(grader).not_to eq Grader.help
     #AutoGrader.create('1', 'WeightedRspecGrader', IO.read(ARGV[0]), :spec => ARGV[1])
   end
-
-  it 'should be able to handle feature grader arguments' do
-    prefix_path = Dir.getwd + '/spec/fixtures/hw3'
-    FileUtils.cp_r "#{prefix_path}/rottenpotatoes" , '/tmp/'
-    args = [
+  it 'should be able to handle feature grader arguments with features archive' do
+    cli_args = [
+        # "type" opt indicating subclass of AutoGrader in next arg
         '-t',
+        # rename grader to FeaturesArchiveGrader
         'HW3Grader',
+        # 'archive' opt says next arg is location, next +1 arg is archive?
         '-a',
+        # This is the standard solution app? Changes to this dir before running.
         '/tmp/rottenpotatoes',
-        "#{prefix_path}/hw3_full_answer_no_parent_dir_app5.tar.gz", # WORKS!
-        ###   "#{prefix_path}/hw3_student_features.tar.gz # Doesn't work, need to add base app files",
-        "#{prefix_path}/hw3.yml"
+        # Archive of the student's features directory
+        'student_features.tar.gz',
+        # File that describes what should pass or fail with mutations
+        'hw3.yml'
     ]
-    grader = Grader.cli(args)
-    #grader = Grader.cli(["-t","HW3Grader","-a","/tmp/","features.tar.gz","hwz.yml"])
-    expect(grader).not_to eq Grader.help
+    grd_args = [ '3', 'HW3Grader', 'student_features.tar.gz', {:description => 'hw3.yml', :mt => true}]
+    execute cli_args, grd_args
   end
-
-
+  # TODO all the specs can use these like feature archive spec above
+  @MOCK_RESULTS = 'MOCK_RESULTS'
+  def execute(cli_args, grd_args, expected=/#{@MOCK_RESULTS}/)
+    set_common_expectations cli_args, grd_args
+    grader = Grader.cli cli_args
+    expect(grader).to match expected
+    return grader
+  end
+  def set_common_expectations(cli_args, grd_args)
+    type = cli_args[1]
+    ag_class = Kernel.const_get type
+    expect  {ag_class.format_cli(*cli_args).to match_array grd_args}.to be_true
+    expect(ag_class).to receive(:format_cli).with(*cli_args).and_call_original
+    expect(AutoGrader).to receive(:create).with(*grd_args).and_return(mock_auto_grader)
+  end
+  def mock_auto_grader
+    auto_grader = double('AutoGrader')
+    auto_grader.should_receive(:grade!)
+    auto_grader.should_receive(:normalized_score).with(100).and_return(67)
+    auto_grader.should_receive(:comments).and_return(@MOCK_RESULTS)
+    return auto_grader
+  end
   xit 'should be able to receive different arguments depending on the grader specified' do
     #HW1 e.g. new_grader -t WeightedRspecGrader "#{PFX}/correct_example.rb", "#{PFX}/correct_example.spec.rb"
     #HW1.5 e.g. new_grader -t HerokuRspecGrader? github_user_name specfile.rb
