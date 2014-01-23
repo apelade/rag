@@ -178,11 +178,9 @@ Then(/^it should have the expected output$/) do
 end
 
 When(/^I run a HW3Grader$/) do
-  # prefix_path = '/home/adminuser/dev/rag/spec/fixtures/hw3'
   # Presumes process launched in rag/
   prefix_path = Dir.getwd + '/spec/fixtures/hw3'
   FileUtils.cp_r "#{prefix_path}/rottenpotatoes" , '/tmp/'
-
   #  args = ['-t', 'HW3Grader', '-a', '/path/to/app/', 'input.tar.gz', 'description.yml' ]
   args = [
       '-t',
