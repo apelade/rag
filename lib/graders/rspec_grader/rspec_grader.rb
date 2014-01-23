@@ -28,7 +28,7 @@ class RspecGrader < AutoGrader
     @comments = runner.output
   end
 
-  @assignment_id = '1'
+  @assignment_id = '1' #TODO should come from yml?
   def self.format_cli(t_opt, type, answer, specs)
     return [@assignment_id, type , answer, {:spec => specs}]
   end
