@@ -72,7 +72,7 @@ describe 'Command Line Interface' do
   def mock_auto_grader
     auto_grader = double('AutoGrader')
     auto_grader.should_receive(:grade!)
-    auto_grader.should_receive(:normalized_score).with(100).and_return(67)
+    auto_grader.should_receive(:normalized_score).with(500).and_return(67)
     auto_grader.should_receive(:comments).and_return(@MOCK_RESULTS)
     return auto_grader
   end
