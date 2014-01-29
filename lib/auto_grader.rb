@@ -1,4 +1,5 @@
-require 'ruby-debug'
+#TODO YA commented out for RubyMine debugger t work
+#require 'ruby-debug'
 
 class AutoGrader
   class AutoGrader::NoSuchGraderError < StandardError ; end
