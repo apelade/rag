@@ -1,6 +1,19 @@
 language: ruby
-rvm: 
-  - "1.9.3"
+rvm:
+- 1.9.3
+env:
+  global:
+    - secure: "GZqZvCXqeK86/autHxsYCvBmvkuAcejPHAUO50/xZKq+aS4j5Y3tpjEAS8mgRqbobJff53HJB212FNCKoLvRC7q6DHyGA7LdEVwDQgz2PcfH5HUF7b5IY8GbJZtVtaJfENho750zRyvL/iWazIJty3PP2n8kuMJqZ333PZwgj8o="
+    - secure: "bxZoiKTqAtqcQAGlcA+cLfpfyNJ6ueRlBBhI8PeMSaPNug5R038DAV02N1Y7cGPSnYxSaRvWcg9TnhNZa+QBltilwQpBeX/ng9J3LySKJ1b/fYSC2zK3MElyO2HG+Qs4tWmtCuP3JhikekwN7zUGJ0BJJEWmxWFcyO4fI9obN0s="
+    - secure: "yrf3vN0yXehs3M6kt6+xzQkA4kxyXGaPGH0/xPnK7gq0giA4bXqT37zYxoi184l1KXcPyNn7UVo3LBj0IEnSvEHjZmOdm7m/YY8eIpM/yFpbyCEWKbBTuqce9uhmpyaRDs8cyIrReZ4F90ur5/4cLa3uxi6VYXqhImh8VUHBu5U="
+install:
+  - bundle install
 script:
-  - bundle exec rspec spec
-  - bundle exec cucumber
+- git clone https://$GIT_USER:$GIT_PASS@$GIT_PATH homeworks
+- cd homeworks/HW3/app
+- BUNDLE_GEMFILE=Gemfile
+- bundle install
+- cd ../../..
+- BUNDLE_GEMFILE=Gemfile
+- bundle exec rspec spec
+- bundle exec cucumber
