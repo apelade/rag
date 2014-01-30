@@ -17,3 +17,8 @@ script:
 - BUNDLE_GEMFILE=Gemfile
 - bundle exec rspec spec
 - bundle exec cucumber
+deploy:
+  provider: heroku
+  app: enigmatic-beyond-1250
+  on:
+    branch: FeatureGrader
