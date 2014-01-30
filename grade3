@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require './lib/auto_grader'
 require 'optparse'
+
+#TODO YA consider removing as gets required in AutoGrader
 require './lib/graders/feature_grader/hw3_grader.rb'
 
 options = {:mt => true}
@@ -22,7 +24,9 @@ d = Dir::getwd
 
 begin
   ARGV.collect! {|p| File.expand_path p}
+#TODO YA this should be done in the cuke_runner, if done at all
   Dir::chdir options.delete(:app)
+#TODO YA this does not seem to affect anything
   ENV["RAILS_ROOT"] = Dir::getwd
   options[:description] = ARGV[1]
 
@@ -30,7 +34,7 @@ begin
     g = AutoGrader.create('3', 'HW3Grader', ARGV[0], options)
     g.grade!
   rescue Object => e
-    STDERR.puts "*** FATAL: #{e.respond_to?(:message) ? e.message : "unspecified error"}"
+    $stderr.puts "*** FATAL: #{e.respond_to?(:message) ? e.message : "unspecified error"}"
     exit 1
   end
   score_max = 500
