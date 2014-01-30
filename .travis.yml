@@ -17,3 +17,6 @@ script:
 - BUNDLE_GEMFILE=Gemfile
 - bundle exec rspec spec
 - bundle exec cucumber
+deploy:
+  provider: heroku
+  app: fathomless-dawn-1787
