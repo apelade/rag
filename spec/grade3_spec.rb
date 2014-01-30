@@ -4,6 +4,7 @@ describe 'grader3' do
   let(:grader) { 'grade3' }
 
   before(:each) do
+    @root_path = Dir::getwd
     @reference_application_folder = File.expand_path('test.app')
     @feature_file = File.expand_path('test.feature')
     @config_file = File.expand_path('test.yml')
@@ -13,7 +14,6 @@ describe 'grader3' do
     AutoGrader.stub(:create).and_return(@auto_grader)
 
     Dir.stub(:chdir)
-    Dir.stub(:getwd).and_return(@reference_application_folder)
 
     @mock_stdout = StringIO.new
     $stdout = @mock_stdout
@@ -40,6 +40,7 @@ describe 'grader3' do
       load grader
     end
     it 'sets the environment variable RAILS_ROOT to reference_application_root' do
+      Dir.stub(:getwd).and_return(@reference_application_folder)
       load grader
       expect(ENV['RAILS_ROOT']).to eq(@reference_application_folder)
     end
@@ -52,6 +53,10 @@ describe 'grader3' do
         @auto_grader # return @autograder double defined in before(:each) block
       end
       load grader
+    end
+    it 'changes back to root directory' do
+      load grader
+      expect(Dir::getwd).to eq(@root_path)
     end
   end
   describe 'running AutoGrader' do
