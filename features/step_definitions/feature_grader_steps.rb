@@ -52,6 +52,8 @@ end
 
 Then /^I should see the tests execute correctly$/ do
   # rspec and cucumber set exit status to 1 if there any fails, otherwise to 0
+  puts @test_status
+  puts @test_status.inspect
   expect(@test_status).to be_success
 end
 
