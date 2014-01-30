@@ -20,5 +20,4 @@ script:
 deploy:
   provider: heroku
   app: enigmatic-beyond-1250
-  on:
-    branch: FeatureGrader
+
