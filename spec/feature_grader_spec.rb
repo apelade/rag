@@ -20,5 +20,10 @@ describe FeatureGrader do
       File.should_receive(:readable?).with('hw3.yml').and_return true
       expect(FeatureGrader.new('foo', {:description => 'hw3.yml'}).logpath).not_to be_nil
     end
+
+    it 'sets the path for cuke_runnner script' do
+      expect(File).to exist($CUKE_RUNNER)
+    end
+
   end
 end
