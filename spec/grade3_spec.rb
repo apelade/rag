@@ -4,16 +4,19 @@ describe 'grader3' do
   let(:grader) { 'grade3' }
 
   before(:each) do
+    @root_path = Dir::getwd
     @reference_application_folder = File.expand_path('test.app')
     @feature_file = File.expand_path('test.feature')
     @config_file = File.expand_path('test.yml')
     ARGV.replace %W(-a #{@reference_application_folder} test.feature test.yml)
 
-    @auto_grader = double(AutoGrader).as_null_object
+    @auto_grader = double(AutoGrader, :normalized_score => 1000, :comments => 'test').as_null_object
     AutoGrader.stub(:create).and_return(@auto_grader)
 
     Dir.stub(:chdir)
-    Dir.stub(:getwd).and_return(@reference_application_folder)
+
+    @mock_stdout = StringIO.new
+    $stdout = @mock_stdout
   end
 
   describe 'validating command line invocation' do
@@ -37,6 +40,7 @@ describe 'grader3' do
       load grader
     end
     it 'sets the environment variable RAILS_ROOT to reference_application_root' do
+      Dir.stub(:getwd).and_return(@reference_application_folder)
       load grader
       expect(ENV['RAILS_ROOT']).to eq(@reference_application_folder)
     end
@@ -50,6 +54,10 @@ describe 'grader3' do
       end
       load grader
     end
+    it 'changes back to root directory' do
+      load grader
+      expect(Dir::getwd).to eq(@root_path)
+    end
   end
   describe 'running AutoGrader' do
     it 'runs AutoGrader' do
@@ -60,18 +68,14 @@ describe 'grader3' do
     it 'raises an error if an AutoGrader fails' do
       mock_stderr = StringIO.new
       $stderr = mock_stderr
-      expect(@auto_grader).to respond_to
       AutoGrader.stub(:create).and_call_original
+
       expect { load grader }.to raise_error
       expect(mock_stderr.string).to include('FATAL')
     end
     it 'prints out the score and comments' do
-      mock_stdout = StringIO.new
-      $stdout = mock_stdout
-      @auto_grader.stub(:normalized_score).and_return(1000)
-
       load grader
-      expect(mock_stdout.string).to include('Score out of', '1000', 'BEGIN', 'END')
+      expect(@mock_stdout.string).to include('Score out of', '1000', 'BEGIN', 'END')
     end
   end
 end

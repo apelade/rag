@@ -6,6 +6,7 @@ env:
     - secure: "0OBx3cM7jGe7WINDem/czkcTaXQDTOu1p/Eub3nIGzMKDjtkPDATz60ujttgdbiXXrKE8UdkASeU7SpNN1ovgBhXarS+ncuBUuLnV9LKu60u2VgAB8/n79G7FxjBJy8u/cMMb+rnw4aL4N3HW+jNNteaJ0SJlDuToHGxFFMFnCA="
     - secure: "e9u2GOuVM+cwsfF1IjJ8OKmFirD3y7QgxiEKElxiMn+dyMpiNNbqfWjrIBalSZ9OondajRCfFzXBQN1RerceKFztXlox7jBQ/gW97Lnbsl4JQ66nXM2SJ3cZaJhGKlx7pB3Oedd2Ch1r8z4IPvl+6HuEfNHwQh13Oww0ZA7W6+w="
     - secure: "U+1N1bydXpdKdjPjPOhzJktPXWcBkJSK2m3T8taFteRcPXKQmeO8nfCSG1oyy1vBR6E5vt3cW9RRzeeMWJMWjBRJdmRLMZjTnEb2cFLlfFFoLvEVzfMT8lt1+3bTB9IT45Gm3nb6RizFZY0hvWhdCaFec8N0cvGzfrCyj8xWjWE="
+
 install:
   - bundle install
 script:
