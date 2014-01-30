@@ -2,7 +2,7 @@
 .ruby-gemset
 .ruby-version
 /homeworks
-
+.travis.yml
 *~
 .#*
 .*.swp
