@@ -1,5 +1,7 @@
-require 'open3'
 require 'yaml'
+
+#TODO YA consider removing as do not seem to be required in this file
+require 'open3'
 require 'term/ansicolor'
 require 'thread'
 require 'fileutils'
@@ -12,7 +14,10 @@ $i_db = 0
 Dir["./lib/graders/feature_grader/lib/*.rb"].each { |file| require file }
 $CUKE_RUNNER = File.join(File.expand_path('lib/graders/feature_grader'), 'cuke_runner')
 
-# +AutoGrader+ that scores using cucumber features
+# Strategy for +AutoGrader+.
+# Grades the features contained in a student submitted cucumber feature file
+# when it is run against a reference application provided by instructor
+
 class FeatureGrader < AutoGrader
 
   class ScenarioMatcher
@@ -67,7 +72,7 @@ class FeatureGrader < AutoGrader
     unless @description = (grading_rules[:spec] || grading_rules[:description]) and File.file? @description and File.readable? @description
       raise ArgumentError, "Unable to find description file #{@description.inspect}"
     end
-
+#TODO YA consider removing $config as does not seem to be used anywhere
     $config = {:mt => grading_rules.has_key?(:mt) ? grading_rules[:mt] : true} # TODO merge all the configs
     $config[:mt] = (ENV["AG_MT"] =~ /1|true/i) if ENV.has_key?("AG_MT")
     $config[:mt] = false
@@ -117,7 +122,7 @@ class FeatureGrader < AutoGrader
 
     # This does some hacky stuff to get references to work properly
     config = {
-      :temp => @temp
+        :temp => @temp
     }
 
     { "scenarios" => ScenarioMatcher,
