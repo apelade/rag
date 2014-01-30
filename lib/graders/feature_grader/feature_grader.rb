@@ -11,7 +11,6 @@ $m_stdout = Mutex.new
 $m_db = Mutex.new
 $i_db = 0
 
-#TODO YA this get required automatically
 Dir["./lib/graders/feature_grader/lib/*.rb"].each { |file| require file }
 $CUKE_RUNNER = File.join(File.expand_path('lib/graders/feature_grader'), 'cuke_runner')
 
