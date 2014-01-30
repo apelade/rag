@@ -1,5 +1,7 @@
-require 'open3'
 require 'yaml'
+
+#TODO YA consider removing as do not seem to be required in this file
+require 'open3'
 require 'term/ansicolor'
 require 'thread'
 require 'fileutils'
@@ -9,10 +11,14 @@ $m_stdout = Mutex.new
 $m_db = Mutex.new
 $i_db = 0
 
+#TODO YA this get required automatically
 Dir["./lib/graders/feature_grader/lib/*.rb"].each { |file| require file }
 $CUKE_RUNNER = File.join(File.expand_path('lib/graders/feature_grader'), 'cuke_runner')
 
-# +AutoGrader+ that scores using cucumber features
+# Strategy for +AutoGrader+.
+# Grades the features contained in a student submitted cucumber feature file
+# when it is run against a reference application provided by instructor
+
 class FeatureGrader < AutoGrader
 
   class ScenarioMatcher
@@ -117,7 +123,7 @@ class FeatureGrader < AutoGrader
 
     # This does some hacky stuff to get references to work properly
     config = {
-      :temp => @temp
+        :temp => @temp
     }
 
     { "scenarios" => ScenarioMatcher,
