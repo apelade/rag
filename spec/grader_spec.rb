@@ -5,7 +5,7 @@ describe 'Command Line Interface' do
     expect(Grader).not_to be_nil
   end
   it "should define a cli method" do
-    lambda { Grader.cli }.should_not raise_error(::NoMethodError)
+    expect { Grader.cli([]) }.not_to raise_error
   end
   it 'should display help when args are not appropriate' do
     expect(Grader.cli(["something"])).to eq Grader.help
@@ -14,7 +14,7 @@ describe 'Command Line Interface' do
     before(:each) do
       IO.should_receive(:read).with("correct_example.rb").and_return("some code")
       args = '1', 'WeightedRspecGrader',"some code",{:spec => "correct_example.spec.rb"}
-      @auto_grader = mock('AutoGrader')
+      @auto_grader = double('AutoGrader')
       @auto_grader.should_receive(:grade!)
       AutoGrader.should_receive(:create).with(*args).and_return(@auto_grader)
     end
@@ -27,7 +27,7 @@ describe 'Command Line Interface' do
   end
   it 'should be able to handle passing in a github username' do
     args = '1', 'GithubRspecGrader',"tansaku",{:spec => "github_spec.rb"}
-    auto_grader = mock('AutoGrader')
+    auto_grader = double('AutoGrader')
     auto_grader.should_receive(:grade!)
     auto_grader.should_receive(:normalized_score).with(100).and_return(67)
     auto_grader.should_receive(:comments).and_return('stuff')
