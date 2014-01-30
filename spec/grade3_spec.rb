@@ -60,7 +60,7 @@ describe 'grader3' do
     it 'raises an error if an AutoGrader fails' do
       mock_stderr = StringIO.new
       $stderr = mock_stderr
-
+      expect(@auto_grader).to respond_to
       AutoGrader.stub(:create).and_call_original
       expect { load grader }.to raise_error
       expect(mock_stderr.string).to include('FATAL')

@@ -34,7 +34,6 @@ begin
     g = AutoGrader.create('3', 'HW3Grader', ARGV[0], options)
     g.grade!
   rescue Object => e
-    puts e.inspect
     $stderr.puts "*** FATAL: #{e.respond_to?(:message) ? e.message : "unspecified error"}"
     exit 1
   end
