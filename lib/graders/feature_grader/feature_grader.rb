@@ -72,7 +72,7 @@ class FeatureGrader < AutoGrader
     unless @description = (grading_rules[:spec] || grading_rules[:description]) and File.file? @description and File.readable? @description
       raise ArgumentError, "Unable to find description file #{@description.inspect}"
     end
-
+#TODO YA consider removing $config as does not seem to be used anywhere
     $config = {:mt => grading_rules.has_key?(:mt) ? grading_rules[:mt] : true} # TODO merge all the configs
     $config[:mt] = (ENV["AG_MT"] =~ /1|true/i) if ENV.has_key?("AG_MT")
     $config[:mt] = false
