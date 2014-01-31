@@ -35,7 +35,7 @@ describe FeatureGrader do
       expect(TempArchiveFile).to receive(:new).with('features').and_return(temp_file)
 
       File.stub(file?: true, readable?: true)
-      feature_grader = FeatureGrader.new('features', {spec: ''})
+      feature_grader = FeatureGrader.new('features', { spec: '' })
 
       expect(feature_grader.instance_variable_get(:@temp)).to eq(temp_file)
     end
@@ -46,10 +46,21 @@ describe FeatureGrader do
 
       File.stub(file?: true, readable?: true)
 
-      feature_grader = FeatureGrader.new('features', {spec: ''})
+      feature_grader = FeatureGrader.new('features', { spec: '' })
       expect(feature_grader.instance_variable_get(:@logpath)).not_to be_nil
       expect(feature_grader.instance_variable_get(:@logpath)).to match(/temp_path\.log/)
     end
+
+      it '#outputs into log instance variable' do
+        File.stub(file?: true, readable?: true)
+
+        temp_file = double(TempArchiveFile, path: '')
+        TempArchiveFile.stub(new: temp_file)
+
+        feature_grader = FeatureGrader.new('', { spec: '' })
+        feature_grader.log('log_1', 'log_2')
+        expect(feature_grader.instance_variable_get(:@output)).to include('log_1', 'log_2')
+      end
   end
 
   describe FeatureGrader::ScenarioMatcher do
