@@ -55,7 +55,7 @@ describe FeatureGrader do
   describe FeatureGrader::ScenarioMatcher do
     before :each do
       @test_config = 'test_config'
-      @hash = { "match" => 'cucumber_output' }
+      @hash = { 'match' => 'cucumber_output' }
       @scenario_matcher = FeatureGrader::ScenarioMatcher.new('grader', @hash, @test_config)
     end
     it '#initialize' do
