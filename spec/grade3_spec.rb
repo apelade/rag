@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'grader3' do
+describe 'grade3' do
   let(:grader) { 'grade3' }
 
   before(:each) do
@@ -20,18 +20,22 @@ describe 'grader3' do
   end
 
   describe 'validating command line invocation' do
+
     it 'prints out usage information when no parameters are passed' do
-      output = `./#{grader}`
-      expect(output).to include('Usage:')
+      ARGV.replace %W()
+      expect{ load grader }.to raise_error
+      expect(@mock_stdout.string).to include('Usage:')
     end
     it 'prints out usage information when wrong number parameters are passed' do
-      output = `./#{grader} -a Test Test`
-      expect(output).to include('Usage:')
+      ARGV.replace %W(-a test.feature)
+      expect{ load grader }.to raise_error
+      expect(@mock_stdout.string).to include('Usage:')
     end
 
     it 'prints out usage information when reference application path is not passed' do
-      output = `./#{grader} test.app test.feature test.yml`
-      expect(output).to include('Usage:')
+      ARGV.replace %W(test.feature test.yml)
+      expect{ load grader }.to raise_error
+      expect(@mock_stdout.string).to include('Usage:')
     end
   end
   describe 'setting environment' do

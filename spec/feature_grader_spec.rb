@@ -74,7 +74,7 @@ describe FeatureGrader do
       expect(@scenario_matcher.present_on?("Scenario: #{@hash['match']}")).to be_true
     end
     it '#to_s' do
-      expect(@scenario_matcher.desc).to eq @hash['match']
+      expect(@scenario_matcher.to_s).to eq @hash['match']
     end
   end
 

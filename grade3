@@ -17,7 +17,7 @@ end.parse!
 
 unless options[:app] and ARGV.count == 2
   puts o
-  exit 1
+  exit 0
 end
 
 d = Dir::getwd
@@ -35,7 +35,7 @@ begin
     g.grade!
   rescue Object => e
     $stderr.puts "*** FATAL: #{e.respond_to?(:message) ? e.message : "unspecified error"}"
-    exit 1
+    exit 0
   end
   score_max = 500
   puts "Score out of #{score_max}: #{g.normalized_score(score_max)}\n"
