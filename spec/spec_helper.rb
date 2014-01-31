@@ -1,8 +1,8 @@
 require 'simplecov'
 SimpleCov.start do
-  filters.clear
+  #filters.clear
   add_filter '/spec/'
-  add_filter '/.rvm/'
+  #add_filter '/.rvm/'
 end
 
 #SimpleCov.start do

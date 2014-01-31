@@ -51,17 +51,58 @@ describe FeatureGrader do
       expect(feature_grader.instance_variable_get(:@logpath)).to match(/temp_path\.log/)
     end
 
-      it '#outputs into log instance variable' do
+    it '#outputs into log instance variable' do
+      File.stub(file?: true, readable?: true)
+
+      temp_file = double(TempArchiveFile, path: '')
+      TempArchiveFile.stub(new: temp_file)
+
+      feature_grader = FeatureGrader.new('', { spec: '' })
+      feature_grader.log('log_1', 'log_2')
+      expect(feature_grader.instance_variable_get(:@output)).to include('log_1', 'log_2')
+    end
+
+    describe '#grade' do
+
+      before :each do
         File.stub(file?: true, readable?: true)
-
-        temp_file = double(TempArchiveFile, path: '')
-        TempArchiveFile.stub(new: temp_file)
-
-        feature_grader = FeatureGrader.new('', { spec: '' })
-        feature_grader.log('log_1', 'log_2')
-        expect(feature_grader.instance_variable_get(:@output)).to include('log_1', 'log_2')
+        @temp_file = double(TempArchiveFile).as_null_object
+        TempArchiveFile.stub(new: @temp_file)
+        @feature_grader = FeatureGrader.new('', { spec: '' })
+        @feature_grader.stub(:load_description)
       end
+
+      it 'sets environment variable' do
+        @feature_grader.grade!
+        expect(ENV['RAILS_ENV']).to eq 'test'
+      end
+
+      it 'grades the homework' do
+        allow(@feature_grader).to receive(:grade!).and_call_original
+        expect(@feature_grader).to receive(:load_description)
+        @feature_grader.grade!
+      end
+
+      it 'creates a score' do
+        @feature_grader.instance_variable_set(:@features, 555)
+        score = double('Total', points: 5, max: '5')
+        Time.stub(now: 24)
+        FeatureGrader::Feature.stub(total: score)
+        expect(@feature_grader).to receive(:log).with("Total score: 5 / 5")
+        expect(@feature_grader).to receive(:log).with("Completed in 0 seconds.")
+        @feature_grader.grade!
+      end
+
+      it 'deletes the temp archive when finished' do
+        @feature_grader.instance_variable_set(:@temp, @temp_file)
+        expect(@temp_file).to receive :destroy
+        @feature_grader.grade!
+      end
+    end
+
   end
+
+
 
   describe FeatureGrader::ScenarioMatcher do
     before :each do
