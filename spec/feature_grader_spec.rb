@@ -77,7 +77,7 @@ describe FeatureGrader do
       expect(@scenario_matcher.desc).to eq @hash['match']
     end
   end
-  
+
 end
 
 #  describe '#new' do

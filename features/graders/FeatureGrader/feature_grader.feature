@@ -16,12 +16,10 @@ Feature: FeatureGrader
 
   Scenario: Reference application is properly set-up (rspec)
     When I run rspec tests on reference application
-    Then I should see test results
     Then I should see the tests execute correctly
 
   Scenario: Reference application is properly set-up (cucumber)
     When I run cucumber tests on reference application
-    Then I should see test results
     Then I should see the tests execute correctly
 
   Scenario: Homeworks config.yml is present
