@@ -129,6 +129,9 @@ describe FeatureGrader do
       scenario_matcher = double(FeatureGrader::ScenarioMatcher).as_null_object
       FeatureGrader::ScenarioMatcher.stub(new: scenario_matcher)
 
+      @feature = double(FeatureGrader::Feature).as_null_object
+      FeatureGrader::Feature.stub(new: @feature)
+
       @feature_grader = FeatureGrader.new('', spec: 'test.yml.file')
 
       # this fixture spec corresponds spec/fixtures/feature_grader.yml
@@ -272,9 +275,13 @@ describe FeatureGrader do
       it 'build an array of FeatureGrader objects' do
         @feature_grader.send(:load_description)
         expect(@feature_grader.instance_variable_get(:@features)).to be_an(Array)
-        expect(@feature_grader.instance_variable_get(:@features)).to have(@fixture_spec['features'].count).feature_grader_obects
-        expect(@feature_grader.instance_variable_get(:@features)[0]).to be_a(FeatureGrader::Feature)
+        expect(@feature_grader.instance_variable_get(:@features)).to have(@fixture_spec['features'].count).feature_obects
 
+        feature = @feature_grader.instance_variable_get(:@features)[0]
+        expect(feature).to eq(@feature)
+        expect(feature[0].if_pass).to eq(@feature)
+        #expect(feature[0].if_pass).to have(3).feature_objects
+        #TODO YA
       end
     end
   end
