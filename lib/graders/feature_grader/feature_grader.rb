@@ -100,7 +100,7 @@ class FeatureGrader < AutoGrader
   def grade!
     begin
       load_description
-
+#TODO YA does not seem like this need it
       ENV['RAILS_ENV'] = 'test'
 
       start_time = Time.now
@@ -120,7 +120,9 @@ class FeatureGrader < AutoGrader
   private
 
   def load_description
-    y = YAML::load_file(@description)
+  #TODO YA we should put requirements on the structure of the file and hash resulting from its loading
+  #TODO YA should raise an exception if Yaml file does not get parsed
+  y = YAML::load_file(@description)
 
     # This does some hacky stuff to get references to work properly
     config = {
@@ -146,7 +148,6 @@ class FeatureGrader < AutoGrader
     y["features"].each {|h| featurize.call(h)}
 
     @features = y["features"].collect {|h| h[:object]}
-    puts 'AAA'
   end
 
 end

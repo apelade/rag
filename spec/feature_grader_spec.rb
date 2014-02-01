@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-
 describe FeatureGrader do
 
   before(:each) do
@@ -16,10 +15,13 @@ describe FeatureGrader do
   describe '#initialize' do
 
     it 'initializes instance variables' do
-      feature_grader = FeatureGrader.new('', { spec: 'spec' })
+      feature_grader = FeatureGrader.new('features_archive', { spec: 'test.yml.file' })
       expect(feature_grader.instance_variable_get(:@output)).to eq([])
       expect(feature_grader.instance_variable_get(:@m_output)).to be_a(Mutex)
       expect(feature_grader.instance_variable_get(:@features)).to eq([])
+
+      expect(feature_grader.instance_variable_get(:@features_archive)).to eq 'features_archive'
+      expect(feature_grader.instance_variable_get(:@description)).to eq 'test.yml.file'
 
     end
     it 'raises error if no features file' do
@@ -120,81 +122,161 @@ describe FeatureGrader do
         @feature_grader.grade!
       end
     end
-
   end
 
-
-  describe 'loads a description' do
+  describe '#load_description' do
     before :each do
       scenario_matcher = double(FeatureGrader::ScenarioMatcher).as_null_object
       FeatureGrader::ScenarioMatcher.stub(new: scenario_matcher)
 
       @feature_grader = FeatureGrader.new('', spec: 'test.yml.file')
 
-      @valid_specs = {
-          "scenarios" => [{ "match" => "a regex", "desc" => "print-friendly literal of regex" }],
-
-          "features" => [
-              { "FEATURE" =>
-                    "features/filter_movie_list.feature",
-                "pass" => true,
-                "weight" => 0.2,
-                "if_pass" => [
-                    { "FEATURE" =>
-                          "features/filter_movie_list.feature",
-                      "version" => 2,
-                      "weight" => 0.075,
-                      "desc" => "results = [G, PG-13] movies",
-                      "failures" => [{ "match" => "the same regex", "desc" => "print-friendly literal of regex" }] }
-                ]
-              }
-          ]
+      # this fixture spec corresponds spec/fixtures/feature_grader.yml
+      @fixture_spec ={ "scenarios" => [
+          {
+              "match" => "restrict to movies with [\"']PG[\"'] or [\"']R[\"'] ratings",
+              "desc" => "restrict to movies with 'PG' or 'R' ratings"
+          },
+          {
+              "match" => "all (ratings|checkboxes) selected",
+              "desc" => "all ratings or checkboxes selected"
+          },
+          {
+              "match" => "sort movies alphabetically"
+          },
+          {
+              "match" => "sort movies in increasing order of release date"
+          }
+      ],
+                       "features" => [
+                           {
+                               "FEATURE" => "features/filter_movie_list.feature",
+                               "pass" => true,
+                               "weight" => 0.2,
+                               "if_pass" => [
+                                   {
+                                       "FEATURE" => "features/filter_movie_list.feature",
+                                       "version" => 2,
+                                       "weight" => 0.075,
+                                       "desc" => "results = [G, PG-13] movies",
+                                       "failures" => [
+                                           {
+                                               "match" => "restrict to movies with [\"']PG[\"'] or [\"']R[\"'] ratings",
+                                               "desc" => "restrict to movies with 'PG' or 'R' ratings"
+                                           },
+                                           {
+                                               "match" => "all (ratings|checkboxes) selected",
+                                               "desc" => "all ratings or checkboxes selected"
+                                           }
+                                       ]
+                                   },
+                                   {
+                                       "FEATURE" => "features/filter_movie_list.feature",
+                                       "version" => 3,
+                                       "weight" => 0.075,
+                                       "desc" => "results = []",
+                                       "failures" => [
+                                           {
+                                               "match" => "restrict to movies with [\"']PG[\"'] or [\"']R[\"'] ratings",
+                                               "desc" => "restrict to movies with 'PG' or 'R' ratings"
+                                           },
+                                           {
+                                               "match" => "all (ratings|checkboxes) selected",
+                                               "desc" => "all ratings or checkboxes selected"
+                                           }
+                                       ]
+                                   },
+                                   { "FEATURE" => "features/filter_movie_list.feature",
+                                     "version" => 4,
+                                     "weight" => 0.075,
+                                     "desc" => "results = [G, PG, PG-13, R] movies",
+                                     "failures" => [
+                                         {
+                                             "match" => "restrict to movies with [\"']PG[\"'] or [\"']R[\"'] ratings",
+                                             "desc" => "restrict to movies with 'PG' or 'R' ratings"
+                                         }
+                                     ]
+                                   }
+                               ]
+                           },
+                           {
+                               "FEATURE" => "features/filter_movie_list.feature",
+                               "version" => 10,
+                               "weight" => 0.075,
+                               "desc" => "results reversed"
+                           },
+                           {
+                               "FEATURE" => "features/sort_movie_list.feature",
+                               "weight" => 0.25,
+                               "if_pass" => [
+                                   {
+                                       "FEATURE" => "features/sort_movie_list.feature",
+                                       "version" => 10,
+                                       "weight" => 0.25,
+                                       "desc" => "results reversed",
+                                       "failures" => [
+                                           {
+                                               "match" => "sort movies alphabetically"
+                                           },
+                                           {
+                                               "match" => "sort movies in increasing order of release date"
+                                           }
+                                       ]
+                                   }
+                               ]
+                           }
+                       ]
       }
-      YAML.stub(load_file: @valid_specs)
+
+      YAML.stub(load_file: @fixture_spec)
     end
 
-    it 'puts the grading_rules spec or description into an instance variable' do
-      expect(@feature_grader.instance_variable_get(:@description)).to eq 'test.yml.file'
-    end
-
-    it 'loads a file with that name into a hash document' do
-      #TODO YA we should put requirements on the structure of the file and hash resulting from its loading
+    it 'loads the description file with YAML' do
       expect(YAML).to receive(:load_file).with('test.yml.file')
       @feature_grader.send(:load_description)
     end
 
-    it 'raises Argument error if the input is bad' do
-      #TODO YA we should assert the presence of scenarios and features
-      YAML.stub(load_file: {})
+    it 'validates that the supplied yml file parsed successfully' do
+      pending 'implement in code'
+    end
+
+    it 'validates the parsed yml file' do
+      valid_specs = { 'features' => [], 'scenarios' => [] }
+      YAML.stub(load_file: valid_specs)
+
+      @feature_grader.send(:load_description)
+    end
+
+    it "raises an error if 'scenarios' key is not present in yml file" do
+      invalid_specs = { 'features' => [] }
+      YAML.stub(load_file: invalid_specs)
+
+      expect { @feature_grader.send(:load_description) }.to raise_error
+    end
+
+    it "raises an error if 'features' key is not present in yml file" do
+      invalid_specs = { 'scenarios' => [] }
+      YAML.stub(load_file: invalid_specs)
+
       expect { @feature_grader.send(:load_description) }.to raise_error
     end
 
     describe 'builds an array of FeatureGrader objects by parsing the description file' do
-      it 'creates a FeatureGrader object'
 
-      it 'processes the document into an array of Feature objects with instance vars for Grader and sub-Features contained by if_pass' do
-        @feature_grader.send(:load_description)
-
-        features_array = @feature_grader.instance_variable_get(:@features)
-        #expect(features_array).to eq []
-
-        root_feature = features_array[0]
-        expect(root_feature).to be_a FeatureGrader::Feature
-
-        grader = root_feature.instance_variable_get(:@grader)
-        expect(grader).to be_a FeatureGrader
-
-        # if a general case passes, run more specific tests
-        child_features = root_feature.instance_variable_get(:@if_pass)
-        expect(child_features[0]).to be_a FeatureGrader::Feature
-
-        # version is used as a feature flag in the solution code to change behavior
-        expect(child_features[0].instance_variable_get(:@env)['version']).to eq '2'
+      it 'creates a FeatureGrader object' do
+        # implement test for correct manipulation of hash loaded from yaml and
+        # creation of Feature objects with correct arguments
+        pending
       end
 
+      it 'build an array of FeatureGrader objects' do
+        @feature_grader.send(:load_description)
+        expect(@feature_grader.instance_variable_get(:@features)).to be_an(Array)
+        expect(@feature_grader.instance_variable_get(:@features)).to have(@fixture_spec['features'].count).feature_grader_obects
+        expect(@feature_grader.instance_variable_get(:@features)[0]).to be_a(FeatureGrader::Feature)
 
+      end
     end
-
   end
 
   describe FeatureGrader::ScenarioMatcher do
@@ -222,6 +304,4 @@ describe FeatureGrader do
       expect(@scenario_matcher.to_s).to eq @hash['match']
     end
   end
-
-
 end
