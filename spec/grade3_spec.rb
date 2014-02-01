@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'grade3' do
-  let(:grader) { 'grade3' }
+  let(:grader) { './lib/grade3.rb' }
 
   before(:each) do
     @root_path = Dir::getwd

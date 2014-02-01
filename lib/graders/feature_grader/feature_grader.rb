@@ -90,8 +90,10 @@ class FeatureGrader < AutoGrader
   def dump_output
     self.comments = @output.join("\n")
     @m_output.synchronize do
-      STDOUT.puts *@output
-      File.open(@logpath, 'a') {|f| f.puts *@output}
+      $stdout.puts *@output
+      f = File.open(@logpath, 'a')
+      f.puts *@output
+      f.close
     end
   end
 

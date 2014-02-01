@@ -1,14 +1,7 @@
 require 'simplecov'
 SimpleCov.start do
-  #filters.clear
   add_filter '/spec/'
-  #add_filter '/.rvm/'
 end
-
-#SimpleCov.start do
-  #filters.clear # This will remove the :root_filter that comes via simplecov's defaults
-
-#end
 
 RSpec.configure do |c|
   c.filter_run_excluding :sandbox => true
