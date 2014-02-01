@@ -133,7 +133,7 @@ class FeatureGrader < AutoGrader
       raise(ArgumentError, "Unable to find required key '#{label}' in #{@description}") unless y[label]
       y[label].each {|h| h[:object] = klass.new(self, h, config)}
     end
-
+    #TODO YA objectify does not seem to be used anywhere
     objectify = lambda {|arr| arr.collect! {|h| h[:object]}}
     featurize = lambda do |f|
       %w( failures ).each do |attr|
@@ -146,6 +146,7 @@ class FeatureGrader < AutoGrader
     y["features"].each {|h| featurize.call(h)}
 
     @features = y["features"].collect {|h| h[:object]}
+    puts 'AAA'
   end
 
 end
