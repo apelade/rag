@@ -51,17 +51,129 @@ describe FeatureGrader do
       expect(feature_grader.instance_variable_get(:@logpath)).to match(/temp_path\.log/)
     end
 
-      it '#outputs into log instance variable' do
+    it '#outputs into log instance variable' do
+      File.stub(file?: true, readable?: true)
+
+      temp_file = double(TempArchiveFile, path: '')
+      TempArchiveFile.stub(new: temp_file)
+
+      feature_grader = FeatureGrader.new('', { spec: '' })
+      feature_grader.log('log_1', 'log_2')
+      expect(feature_grader.instance_variable_get(:@output)).to include('log_1', 'log_2')
+    end
+
+    describe '#grade' do
+
+      before :each do
         File.stub(file?: true, readable?: true)
-
-        temp_file = double(TempArchiveFile, path: '')
-        TempArchiveFile.stub(new: temp_file)
-
-        feature_grader = FeatureGrader.new('', { spec: '' })
-        feature_grader.log('log_1', 'log_2')
-        expect(feature_grader.instance_variable_get(:@output)).to include('log_1', 'log_2')
+        @temp_file = double(TempArchiveFile).as_null_object
+        TempArchiveFile.stub(new: @temp_file)
+        @feature_grader = FeatureGrader.new('', { spec: '' })
+        @feature_grader.stub(:load_description)
       end
+
+      it 'sets environment variable' do
+        @feature_grader.grade!
+        expect(ENV['RAILS_ENV']).to eq 'test'
+      end
+
+      it 'grades the homework' do
+        allow(@feature_grader).to receive(:grade!).and_call_original
+        expect(@feature_grader).to receive(:load_description)
+        @feature_grader.grade!
+      end
+
+      it 'creates a score' do
+        @feature_grader.instance_variable_set(:@features, 555)
+        score = double('Total', points: 5, max: '5')
+        Time.stub(now: 24)
+        FeatureGrader::Feature.stub(total: score)
+        expect(@feature_grader).to receive(:log).with("Total score: 5 / 5")
+        expect(@feature_grader).to receive(:log).with("Completed in 0 seconds.")
+        @feature_grader.grade!
+      end
+
+      it 'deletes the temp archive when finished' do
+        @feature_grader.instance_variable_set(:@temp, @temp_file)
+        expect(@temp_file).to receive :destroy
+        @feature_grader.grade!
+      end
+    end
+
   end
+
+
+  describe 'loads a description' do
+
+    before :each do
+      File.stub(file?: true, readable?: true)
+      temp_file = double(TempArchiveFile).as_null_object
+      TempArchiveFile.stub(new: temp_file)
+      scenario_matcher = double(FeatureGrader::ScenarioMatcher).as_null_object
+      FeatureGrader::ScenarioMatcher.stub(new: scenario_matcher)
+      @feature_grader = FeatureGrader.new('', spec: 'test.yml.file')
+
+      @valid_specs = {
+          "scenarios" => [{"match" => "a regex", "desc" => "print-friendly literal of regex"}],
+
+          "features" => [
+              {"FEATURE" =>
+                   "features/filter_movie_list.feature",
+                   "pass" => true,
+                   "weight" => 0.2,
+                   "if_pass" => [
+                       {"FEATURE" =>
+                            "features/filter_movie_list.feature",
+                            "version" => 2,
+                            "weight" => 0.075,
+                            "desc" => "results = [G, PG-13] movies",
+                            "failures" => [{"match" => "the same regex", "desc" => "print-friendly literal of regex"}]}
+                   ]
+              }
+          ]
+      }
+
+      YAML.stub(load_file: @valid_specs)
+
+    end
+
+    it 'puts the grading_rules spec or description into an instance variable' do
+      expect(@feature_grader.instance_variable_get(:@description)).to eq 'test.yml.file'
+    end
+
+    it 'loads a file with that name into a hash document' do
+      expect(YAML).to receive(:load_file).with('test.yml.file')
+      @feature_grader.send( :load_description )
+    end
+
+    it 'raises Argument error if the input is bad' do
+      YAML.stub(load_file: {})
+      expect {@feature_grader.send( :load_description )}.to raise_error
+    end
+
+    it 'processes the document into an array of Feature objects with instance vars for Grader and sub-Features contained by if_pass' do
+      @feature_grader.send( :load_description )
+
+      features_array = @feature_grader.instance_variable_get(:@features)
+      #expect(features_array).to eq []
+
+      root_feature = features_array[0]
+      expect(root_feature).to be_a FeatureGrader::Feature
+
+      grader = root_feature.instance_variable_get(:@grader)
+      expect(grader).to be_a FeatureGrader
+
+      # if a general case passes, run more specific tests
+      child_features = root_feature.instance_variable_get(:@if_pass)
+      expect(child_features[0]).to be_a FeatureGrader::Feature
+
+      # version is used as a feature flag in the solution code to change behavior
+      expect(child_features[0].instance_variable_get(:@env)['version']).to eq '2'
+    end
+
+  end
+
+
 
   describe FeatureGrader::ScenarioMatcher do
     before :each do
