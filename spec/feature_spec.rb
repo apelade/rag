@@ -115,7 +115,7 @@ describe FeatureGrader::Feature do
          m_output: double(Mutex),
          features: [],
          features_archive: "features.tar.gz",
-         description: "hw3.yml",
+         description: 'spec/fixtures/feature_grader.yml',
          temp: double(TempArchiveFile ),
          tempfile: double(Tempfile,
             path: '/tmp/submission20140201-9800-mykiwl'
@@ -220,7 +220,7 @@ describe FeatureGrader::Feature do
   describe 'valid nested feature object after processing' do
     let(:feature) {
       feature = @fixture_spec['features'].first
-      @fgrader = FeatureGrader.new('features.tar.gz', {spec: 'hw3.yml'})
+      @fgrader = FeatureGrader.new('features.tar.gz', {spec: 'spec/fixtures/feature_grader.yml'})
       @fgrader.send(:load_description)
       FeatureGrader::Feature.new(@fgrader, feature, {})
     }
@@ -233,7 +233,7 @@ describe FeatureGrader::Feature do
       expect(feature.instance_variable_get(:@output)).to eq []
       expect(feature.desc).to be_nil
       expect(feature.weight).to eq 0.2
-      expect(@fgrader.instance_variable_get(:@description)).to eq 'hw3.yml'
+      expect(@fgrader.description).to eq 'spec/fixtures/feature_grader.yml'
       expect(@fgrader.instance_variable_get(:@m_output)).to be_a(Mutex)
 
       expect(feature.target_pass).to be_true
@@ -246,8 +246,8 @@ describe FeatureGrader::Feature do
       expect(sub_features[0]).to be_a(FeatureGrader::Feature)
         sf0_grader = sub_features[0].grader
         expect(sf0_grader).to be_a(FeatureGrader::Feature)
-          sf01_grader = sf0_grader.grader
-          expect(sf01_grader).to be_a(FeatureGrader)
+          sf0_1_grader = sf0_grader.grader
+          expect(sf0_1_grader).to be_a(FeatureGrader)
 
       expect(sub_features[1]).to be_a(FeatureGrader::Feature)
       expect(sub_features[2]).to be_a(FeatureGrader::Feature)
