@@ -11,6 +11,7 @@ group :development, :testing do
   gem 'debugger'
   gem 'simplecov'
   gem 'simplecov-rcov'
+  gem 'coveralls', require: false
   gem 'addressable'
   gem 'cucumber'
 end
