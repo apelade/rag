@@ -6,8 +6,7 @@ require 'net/http'
 require 'base64'
 require 'cgi'
 require 'date'
-#TODO YA commented out for RubyMine debugger t work
-#require 'ruby-debug'
+require 'ruby-debug'
 
 require_relative 'rag_logger'
 require_relative 'edx_controller'

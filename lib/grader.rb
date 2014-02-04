@@ -3,7 +3,7 @@ require './lib/auto_grader.rb'
 class Grader
 
   # TODO use optparse like rag/grade3
-  # TODO Simply do: return Kernel.const_get(type).new(args).grade!
+  # Simply do: return Kernel.const_get(type).new(args).grade!
   def self.cli(args)
     return self.help if args.nil? || args.length < 4 || ! args[1] =~ /Grader/
     original_dir = Dir.getwd
@@ -11,10 +11,12 @@ class Grader
       if args[2] == '-a'
         working_dir = args[3]
         Dir.chdir(working_dir)
+        ENV['BUNDLE_GEMFILE'] = working_dir + '/Gemfile'
       end
       self.run_grader(args)
     ensure
       Dir.chdir original_dir
+      ENV['BUNDLE_GEMFILE'] = original_dir + '/Gemfile'
     end
   end
 

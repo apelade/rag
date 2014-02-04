@@ -1,7 +1,5 @@
-require 'yaml'
-
-#TODO YA consider removing as do not seem to be required in this file
 require 'open3'
+require 'yaml'
 require 'term/ansicolor'
 require 'thread'
 require 'fileutils'
@@ -14,10 +12,7 @@ $i_db = 0
 Dir["./lib/graders/feature_grader/lib/*.rb"].each { |file| require file }
 $CUKE_RUNNER = File.join(File.expand_path('lib/graders/feature_grader'), 'cuke_runner')
 
-# Strategy for +AutoGrader+.
-# Grades the features contained in a student submitted cucumber feature file
-# when it is run against a reference application provided by instructor
-
+# +AutoGrader+ that scores using cucumber features
 class FeatureGrader < AutoGrader
 
   class ScenarioMatcher
@@ -72,7 +67,7 @@ class FeatureGrader < AutoGrader
     unless @description = (grading_rules[:spec] || grading_rules[:description]) and File.file? @description and File.readable? @description
       raise ArgumentError, "Unable to find description file #{@description.inspect}"
     end
-#TODO YA consider removing $config as does not seem to be used anywhere
+
     $config = {:mt => grading_rules.has_key?(:mt) ? grading_rules[:mt] : true} # TODO merge all the configs
     $config[:mt] = (ENV["AG_MT"] =~ /1|true/i) if ENV.has_key?("AG_MT")
     $config[:mt] = false
@@ -90,17 +85,15 @@ class FeatureGrader < AutoGrader
   def dump_output
     self.comments = @output.join("\n")
     @m_output.synchronize do
-      $stdout.puts *@output
-      f = File.open(@logpath, 'a')
-      f.puts *@output
-      f.close
+      STDOUT.puts *@output
+      File.open(@logpath, 'a') {|f| f.puts *@output}
     end
   end
 
   def grade!
     begin
       load_description
-#TODO YA does not seem like this need it
+
       ENV['RAILS_ENV'] = 'test'
 
       start_time = Time.now
@@ -120,13 +113,11 @@ class FeatureGrader < AutoGrader
   private
 
   def load_description
-  #TODO YA we should put requirements on the structure of the file and hash resulting from its loading
-  #TODO YA should raise an exception if Yaml file does not get parsed
-  y = YAML::load_file(@description)
+    y = YAML::load_file(@description)
 
     # This does some hacky stuff to get references to work properly
     config = {
-        :temp => @temp
+      :temp => @temp
     }
 
     { "scenarios" => ScenarioMatcher,
@@ -135,7 +126,7 @@ class FeatureGrader < AutoGrader
       raise(ArgumentError, "Unable to find required key '#{label}' in #{@description}") unless y[label]
       y[label].each {|h| h[:object] = klass.new(self, h, config)}
     end
-    #TODO YA objectify does not seem to be used anywhere
+
     objectify = lambda {|arr| arr.collect! {|h| h[:object]}}
     featurize = lambda do |f|
       %w( failures ).each do |attr|

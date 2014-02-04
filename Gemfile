@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+source :rubygems
 
 gem 'rspec'
 gem 'metric_fu'
@@ -14,4 +14,3 @@ group :development, :testing do
   gem 'addressable'
   gem 'cucumber'
 end
-

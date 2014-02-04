@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'grade3' do
-  let(:grader) { './lib/grade3.rb' }
+  let(:grader) { './grade3' }
 
   before(:each) do
     @root_path = Dir::getwd
@@ -70,12 +70,17 @@ describe 'grade3' do
     end
 
     it 'raises an error if an AutoGrader fails' do
+      $VERBOSE = nil #suppresing warnings when reassigning constants
+      old_stderr = STDERR
       mock_stderr = StringIO.new
-      $stderr = mock_stderr
+      STDERR = mock_stderr
+
       AutoGrader.stub(:create).and_call_original
 
       expect { load grader }.to raise_error
       expect(mock_stderr.string).to include('FATAL')
+
+      STDERR = old_stderr
     end
     it 'prints out the score and comments' do
       load grader

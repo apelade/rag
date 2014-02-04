@@ -1,5 +1,4 @@
-#TODO YA commented out for RubyMine debugger t work
-#require 'ruby-debug'
+require 'ruby-debug'
 require 'open3'
 require 'yaml'
 require 'term/ansicolor'

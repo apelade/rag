@@ -21,11 +21,4 @@ class HW3Grader < FeatureGrader
     return comments_msg + score_msg
   end
 
-  def grade!
-    ENV["RAILS_ROOT"] = Dir.getwd
-    # could move to feature_grader or cuke_runner
-    ENV['BUNDLE_GEMFILE']='Gemfile'
-    super
-  end
-
 end
