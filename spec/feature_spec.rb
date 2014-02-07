@@ -122,41 +122,71 @@ describe FeatureGrader::Feature do
       FileUtils.stub(rm: true, cp: true)
       FeatureClass.any_instance.stub(dump_output: '')
       File.stub(readable?: true, exists?: true, join: '')
-      Open3.stub(:popen3)
+      ##Open3.stub(:popen3)
     end
 
     it 'uses some global variables for threads' do
       pending
     end
 
-    it 'uses some CukeRunner in an internal Open3 process' do
-      pending
-    end
-
-    it 'errors from that Open3 process are silently discarded' do
+    it 'uses $CUKE_RUNNER and an internal Open3 process' do
       pending
     end
 
     it 'copies the feature.env' do
       expect(@feature.instance_variable_get(:@env)).to receive(:dup).and_call_original
+      Open3.stub(:popen3)
+
       result = @feature.run!
     end
 
     it 'gives results' do
       expect(@feature.instance_variable_get(:@env)).to receive(:dup).and_call_original
+      Open3.stub(:popen3)
+
       result = @feature.run!
       expect(result.to_s).to eq('0.0 / 0.0')
     end
 
     it 'uses a tempfile for the path' do
       expect(@feature.instance_variable_get(:@config)[:temp]).to receive(:path).exactly(6).times
+      Open3.stub(:popen3)
+
       result = @feature.run!
     end
 
-    it 'rescues TestFailedErrors and sends them as StandardError' do
+    it 'rescues TestFailedErrors and raises them as StandardError ' do
       Open3.stub(:popen3).and_raise(FeatureClass::TestFailedError)
       expect(@feature).to receive(:log).exactly(3).times
       expect {@feature.run!}.to raise_error(StandardError)
+    end
+
+    it 'rescues StandardError and adds to their message' do
+      Open3.stub(:popen3).and_raise(StandardError)
+      expect(@feature).to receive(:log).exactly(3).times
+      expect {@feature.run!}.to raise_error(StandardError, /failed to run because/)
+    end
+
+    it 'calls score#pass if weight is not defined ' do
+      score = Score.new
+      Score.stub(:new).and_return(score)
+      @feature.instance_variable_set(:@weight, nil)
+      expect(score).to receive(:pass).with(nil)
+      Open3.stub(:popen3)
+
+      @feature.run!
+    end
+
+    it 'reports failing if errors occur when correcting' do
+      FeatureClass.stub(correct?: false)
+      @feature.stub(:correct!).and_raise(FeatureClass::IncorrectAnswer)
+      score = double(Score).as_null_object
+      Score.stub(:new).and_return(score)
+      expect(score).to receive(:fail).once
+      expect(@feature).to receive(:log).exactly(4).times
+      Open3.stub(:popen3)
+
+      @feature.run!
     end
 
   end
@@ -210,9 +240,7 @@ describe FeatureGrader::Feature do
   end
 
   describe '#process_output' do
-    it 'processes the output' do
-      pending
-    end
+    pending
   end
 
 end
