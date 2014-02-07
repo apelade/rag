@@ -66,6 +66,7 @@ describe FeatureGrader do
     end
 
     it 'stores output in comments' do
+
       @feature_grader.dump_output
       expect(@feature_grader.comments).to include('log_1', 'log_2')
     end

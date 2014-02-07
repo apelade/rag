@@ -8,15 +8,29 @@ describe FeatureGrader::Feature do
 
 
   before(:each) do
-    @feature_hash = {'FEATURE' => {}, :version => '2'}
-    @feature = FeatureClass.new('grader', @feature_hash, {})
+    @tempfile = Tempfile.new ['submission', '.tar.gz']
+
+    @feature_hash = {'FEATURE' => {},}
+    @feature = FeatureClass.new('grader', @feature_hash, {:temp => @tempfile})
+    feature2 = FeatureClass.new('grader', @feature_hash, {:temp => @tempfile, :version => '2'})
+    feature3 = FeatureClass.new('grader', @feature_hash, {:temp => @tempfile, :version => '3'})
+    @feature.instance_variable_set(:@if_pass, [feature2, feature3])
+
     @true_matcher  = double(FeatureGrader::ScenarioMatcher, match?: true)
+    @cucumber_output = ["88 steps (14 failed, 28 skipped, 46 passed)"]
 
   end
 
   describe '#total' do
     it 'totals the score' do
-      pending
+      FeatureClass.any_instance.stub(run!: 5, dump_output: '')
+      expect(FeatureClass.total(@feature.if_pass).to_s).to eq "10 / 10"
+    end
+    it 'returns a blank score when it rescues certain errors'  do
+      FeatureGrader::Feature.any_instance.stub(dump_output: '')
+      FeatureGrader::Feature.any_instance.stub(:run!).and_raise(FeatureGrader::Feature::TestFailedError)
+      Mutex.any_instance.stub(:synchronize)
+      expect(FeatureClass.total(@feature.if_pass).to_s).to eq(Score.new.to_s)
     end
   end
 
@@ -47,8 +61,8 @@ describe FeatureGrader::Feature do
       expect('test' =~ FeatureClass::Regex::FailingScenarios).to be_nil
     end
     it '#StepResult' do
-      output = "88 steps (14 failed, 28 skipped, 46 passed)"
-      num_steps, num_passed = output.scan(FeatureClass::Regex::StepResult).first
+      output = @cucumber_output
+      num_steps, num_passed = output.first.scan(FeatureClass::Regex::StepResult).first
       expect(num_steps).to eq '88'
       expect(num_passed).to eq '46'
       expect ('test' =~ FeatureClass::Regex::StepResult) == nil
@@ -71,14 +85,16 @@ describe FeatureGrader::Feature do
       expect(@feature.output).to eq []
       expect(@feature.desc).to eq nil
       expect(@feature.weight).to eq 0.0
+
       # array of ScenarioMatchers
       expect(@feature.failures).to eq []
       expect(@feature.scenarios).to eq({failed: [], missing: []})
       # array of sub-features
-      expect(@feature.if_pass).to eq []
-      expect(@feature.instance_variable_get(:@config)).to eq({})
+      expect(@feature.if_pass).to have(2).subfeatures
+      @feature.if_pass.each{|f| expect(f).to be_a(FeatureClass)}
+      expect(@feature.instance_variable_get(:@config)[:temp]).to be_a(Tempfile)
       # correct version location is in sub-features
-      expect(@feature.instance_variable_get(:@env)).to eq("FEATURE" => "{}", "version" => "2")
+      expect(@feature.instance_variable_get(:@env)).to eq("FEATURE" => "{}")
     end
 
   end
@@ -101,7 +117,48 @@ describe FeatureGrader::Feature do
   end
 
   describe '#run!' do
-    pending
+
+    before :each do
+      FileUtils.stub(rm: true, cp: true)
+      FeatureClass.any_instance.stub(dump_output: '')
+      File.stub(readable?: true, exists?: true, join: '')
+      Open3.stub(:popen3)
+    end
+
+    it 'uses some global variables for threads' do
+      pending
+    end
+
+    it 'uses some CukeRunner in an internal Open3 process' do
+      pending
+    end
+
+    it 'errors from that Open3 process are silently discarded' do
+      pending
+    end
+
+    it 'copies the feature.env' do
+      expect(@feature.instance_variable_get(:@env)).to receive(:dup).and_call_original
+      result = @feature.run!
+    end
+
+    it 'gives results' do
+      expect(@feature.instance_variable_get(:@env)).to receive(:dup).and_call_original
+      result = @feature.run!
+      expect(result.to_s).to eq('0.0 / 0.0')
+    end
+
+    it 'uses a tempfile for the path' do
+      expect(@feature.instance_variable_get(:@config)[:temp]).to receive(:path).exactly(6).times
+      result = @feature.run!
+    end
+
+    it 'rescues TestFailedErrors and sends them as StandardError' do
+      Open3.stub(:popen3).and_raise(FeatureClass::TestFailedError)
+      expect(@feature).to receive(:log).exactly(3).times
+      expect {@feature.run!}.to raise_error(StandardError)
+    end
+
   end
 
   describe '#correct?' do
@@ -141,12 +198,13 @@ describe FeatureGrader::Feature do
     end
 
     # TODO feature.rb line 214 comparison is wrong? It should be unless the total == passed then raise?
-    it 'raises error if failures are not defined but not all the scenario steps passed' do
-      @feature.instance_variable_set(:@scenarios, {failed: ['anything'], missing: [], steps: {total:2, passed: 1}})
-      expect {@feature.correct!}.not_to raise_error #.to raise_error
-      @feature.instance_variable_set(:@scenarios, {failed: ['anything'], missing: [], steps: {total:1, passed: 1}})
-      expect {@feature.correct!}.to raise_error # .not_to raise_error
-    end
+    #it 'raises error if failures are not defined but not all the scenario steps passed' do
+    #  @feature.instance_variable_set(:@scenarios, {failed: ['anything'], missing: [], steps: {total:1, passed: 200}})
+    #  expect {@feature.correct!}.to raise_error
+    #
+    #  @feature.instance_variable_set(:@scenarios, {failed: ['anything'], missing: [], steps: {total:1, passed: 1}})
+    #  expect {@feature.correct!}.not_to raise_error
+    #end
 
 
   end
