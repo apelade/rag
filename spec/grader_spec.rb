@@ -66,7 +66,7 @@ describe 'Command Line Interface' do
   def set_common_expectations(cli_args, grd_args)
     type = cli_args[1]
     ag_class = Kernel.const_get type
-    expect  {ag_class.format_cli(*cli_args).to match_array grd_args}.to be_true
+    expect(ag_class.format_cli(*cli_args)).to match_array grd_args
     ag_class.should_receive(:format_cli).with(*cli_args).and_call_original
     AutoGrader.should_receive(:create).with(*grd_args).and_return(mock_auto_grader)
   end
