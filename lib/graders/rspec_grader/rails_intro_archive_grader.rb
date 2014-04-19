@@ -3,38 +3,13 @@ require 'net/http'
 
 
 class RailsIntroArchiveGrader < HerokuRspecGrader
+
+
   def initialize(archive, grading_rules)
     super('', grading_rules)
     #TODO make it other than port 3000
-    #@host_uri = 'http://localhost:3000'
     @host_uri = 'http://127.0.0.1:3000'
     @archive = archive
-  end
-
-  def run_process(cmd, dir)
-    #env = {
-    #    'RAILS_ROOT' => @temp,
-    #    'RAILS_ENV' => 'test',
-    #    'BUNDLE_GEMFILE' => 'Gemfile'
-    #}
-      @output, @errors, @status = Open3.capture3(
-          cmd, :chdir => dir
-      #env, cmd, :chdir => dir
-      )
-      puts (cmd +
-          @output +
-          @errors +
-          @status.to_s) unless @status.success? and @test_errors == ''
-
-    # Gets Net:HTTP:Persistent error
-    #Open3.popen3(env, cmd) do |stdin, stdout, stderr, wait_thr|
-    #  exitstatus = wait_thr.value.exitstatus
-    #  out = stdout.read
-    #  err = stderr.read
-    #  if exitstatus != 0
-    #    raise out + err
-    #  end
-    #end
   end
 
 
@@ -51,10 +26,7 @@ class RailsIntroArchiveGrader < HerokuRspecGrader
       pid = Process.fork do
         run_process('rails s', @temp)
       end
-      #Process.detach(pid)
 
-      # Gets Net::HTTP::Persistent::Error on local if no timeout, increasing for travis
-      # Max timeout in seconds to wait for rails to respond to http before peppering with tests
       wait_for_app_max(30)
 
       super
@@ -70,13 +42,24 @@ class RailsIntroArchiveGrader < HerokuRspecGrader
   end
 
 
+  def run_process(cmd, dir)
+    @output, @errors, @status = Open3.capture3(
+        cmd, :chdir => dir
+    )
+    puts (cmd +
+        @output +
+        @errors +
+        @status.to_s) unless @status.success? and @test_errors == ''
+  end
+
+
   def wait_for_app_max(sec, polling=1)
     to_status = timeout(sec) {
       sleep(polling) until app_loaded?
     }
   end
 
-  
+
   def app_loaded?
     begin
       #return true if `pgrep -f "ruby script/rails s"` != ''
