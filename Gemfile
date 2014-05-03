@@ -16,7 +16,15 @@ group :development, :testing do
   gem 'simplecov-rcov'
   gem 'addressable'
   gem 'cucumber'
-  gem 'capybara'
+  gem 'jquery-rails'
+
+  gem 'capybara', '~> 2.1.0'
+  ### must also generate spec_helper: `rails g rpsec:install`
+  gem 'rspec-rails'#
+
+  gem 'mechanize'
+  gem 'capybara-mechanize'
+  # Use unicorn as the web ser
   gem 'rspec-rails'# must do rails g rpsec:install
 
 end
