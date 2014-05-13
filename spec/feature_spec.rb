@@ -217,10 +217,19 @@ describe FeatureGrader::Feature do
     end
   end
 
+
+  #  describe 'valid nested feature object after processing' do
+  #    let(:feature) {
+    #      feature = @fixture_spec['features'].first
+    #      @fgrader = FeatureGrader.new('features.tar.gz', {spec: 'hw3.yml'})
+    #      @fgrader.send(:load_description)
+    #      FeatureGrader::Feature.new(@fgrader, feature, {})
+    #    }
+
   describe 'valid nested feature object after processing' do
     let(:feature) {
       feature = @fixture_spec['features'].first
-      @fgrader = FeatureGrader.new('features.tar.gz', {spec: 'spec/fixtures/feature_grader.yml'})
+      @fgrader = FeatureGrader.new('', {spec: 'spec/fixtures/feature_grader.yml'})
       @fgrader.send(:load_description)
       FeatureGrader::Feature.new(@fgrader, feature, {})
     }
