@@ -6,14 +6,12 @@ SPORK_SCREEN=Spork
 EDX_CLIENT_SCREEN=Edx-client
 SCROLLBACK_DEFAULT=1000
 
-
-USER_REPO=saasbook
+USER_REPO=apelade
 # The update_3218 branch is Spring2014 with hw_updates
 RAG_BRANCH=devel_update #Spring2014
 HW_BRANCH=devel_update #Spring2014
-ROTTENPOTATOES_BRANCH=hw3_solution
+ROTTENPOTATOES_BRANCH=devel_update #hw3_solution
 RUBYGEMS_VERSION=2.2.0
-
 #clear
 
 
@@ -68,19 +66,22 @@ read -p "* If above info is correct, click Enter key to continue, or Ctrl+c to e
 
 
 
+
+
 echo "
 ############################## Install Dependencies ###########################
 "
 
 
 
+
+
 sudo apt-get install -y git
 sudo apt-get install -y curl
 
-
 sudo -H -u ubuntu bash -c "\curl -L https://get.rvm.io | bash -s stable  --ruby=1.9.3"
 source /home/ubuntu/.rvm/scripts/rvm
-# rvm --install use 1.9.3 && rvm rubygems --force $RUBYGEMS_VERSION
+rvm --install use 1.9.3 && rvm rubygems --force $RUBYGEMS_VERSION
 gem install therubyracer -v '0.9.10'
 sudo apt-get install -y libxslt-dev libxml2-dev libpq-dev
 source /home/ubuntu/.bash_profile
@@ -99,7 +100,6 @@ pwd
 git checkout $RAG_BRANCH
 git branch -a
 bundle install
-
 bundle exec rspec
 bundle exec cucumber
 cd ..
@@ -125,8 +125,6 @@ cd hw/bdd-cucumber/public/rottenpotatoes/
 rvm gemset create rag3
 mv rag3.gems rag3.gems.BAK
 bundle install
-bundle exec rake db:migrate
-bundle exec rake db:test:prepare
 rvm gemset export rag3
 rvm gemset import rag3 # => failed unless export first
 rvm gemset use rag3
@@ -143,7 +141,7 @@ pwd
 git checkout $ROTTENPOTATOES_BRANCH
 # TODO update not needed when Spring2014 branch gets updated Gemfile.lock
 #git checkout -tb Spring2014 origin/Spring2014 #bundle update --source therubyracer
-bundle update --source therubyracer
+#bundle update --source therubyracer
 bundle install
 bundle exec rake db:create
 bundle exec rake db:migrate
@@ -231,8 +229,11 @@ $0 done!
 
 * Now do these:
 * source ~/.bash_profile
-* May need to do bundle install in each rottenpotatoes app, incl rag/hw4_grader_stuff
+* May need to do bundle install in each rottenpotatoes app
+  incl rag/hw4_grader_stuff and 'rvm gemset use rag3' in hw/bdd-cucumber/public/rottenpotatoes
 * Check courseware is same queue and assignments as
   in the recently modified ./rag/config/autograders.yml
+* for migration grader (performance homework) a directory migration_grader will be required in the root, and inside the rjmHW6 branch of the https://github.com/saasbook/rottenpotatoes is required
 "
+
 
