@@ -5,13 +5,15 @@
 SPORK_SCREEN=Spork
 EDX_CLIENT_SCREEN=Edx-client
 SCROLLBACK_DEFAULT=1000
-#TODO switch to saasbook and develop branch after merge of devel_update branches
-USER_REPO=apelade
-RAG_BRANCH=devel_update #develop
-HW_BRANCH=devel_update #develop
-ROTTENPOTATOES_BRANCH=devel_update
-#This is the current version, not forcing
-#RUBYGEMS_VERSION=2.2.2
+
+
+USER_REPO=saasbook
+# The update_3218 branch is Spring2014 with hw_updates
+RAG_BRANCH=devel_update #Spring2014
+HW_BRANCH=devel_update #Spring2014
+ROTTENPOTATOES_BRANCH=hw3_solution
+RUBYGEMS_VERSION=2.2.0
+
 #clear
 
 
