@@ -4,3 +4,10 @@ rvm:
 script:
   - bundle exec rspec spec
   - bundle exec cucumber
+# build projects using this repo  
+env:
+  global:
+    - secure: <your_encrypted_token>
+after_success:
+  - chmod 755 ./build_children.sh
+  - ./build_children.sh
