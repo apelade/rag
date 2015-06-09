@@ -4,3 +4,12 @@ rvm:
 script:
   - bundle exec rspec spec
   - bundle exec cucumber
+  
+# build test repos
+env:
+  global:
+  - secure: "mHXV+eXUEjrZvo8LzwWzVL1rc3cwe99nIpbzyWygyqKQTVwpbi/lBxCE/FRlxhP04PopOUVfHuefJOGoF6uodbwC8+SMLZOyhGLgsREetd6YagdbCVMSSzmUNXfaJaOKDKdCoMcZPrsrQmQKhb6w7gYi/Ezpyj5DW/j6VaiVi9Q="
+after_success:
+  - chmod 755 ./build_children.sh
+  - ./build_children.sh
+  
