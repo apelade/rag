@@ -13,3 +13,4 @@ after_success:
   - chmod 755 ./build_children.sh
   - ./build_children.sh
   
+  
