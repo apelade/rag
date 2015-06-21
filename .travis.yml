@@ -1,12 +1,12 @@
 language: ruby
 rvm: 
-  - 1.9.3
+  - 2.0.0
 script:
   - bundle exec rspec spec
   - bundle exec cucumber
-install:
-  - gem install ruby-debug19
-  - bundle install
-notifications:
-  email: false
-  slack: cs169dev:OPMf1tPzfO3a4gz6gGTOFV7w
+#install:
+#  - gem install ruby-debug19
+#  - bundle install
+#notifications:
+#  email: false
+#  slack: cs169dev:OPMf1tPzfO3a4gz6gGTOFV7w
